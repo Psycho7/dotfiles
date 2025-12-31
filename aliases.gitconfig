@@ -1,21 +1,24 @@
 [alias]
-	# status
-	st = status
+    # status
+    st = status
 
-	# fetch
-	f = fetch --all --verbose
+    # fetch
+    f = fetch --all --verbose
 
     # add
     a = add
     aa = add --all
 
-	# commit
-	c = commit
-	cm = commit --message
-	amend = commit -a --amend --no-edit
+    # commit
+    c = commit
+    ca = commit --all
+    cm = commit --message
+    cam = commit --all --message
+    amend = commit -a --amend --no-edit
+    now = commit --amend --date=now --no-edit
 
-	# assume-unchanged
-	hide = update-index --assume-unchanged
-	hidden = ! git ls-files -v | rg '^h'
-	unhide = update-index --no-assume-unchanged
-	unhide-all = update-index --really-refresh
+    # assume-unchanged
+    hide = update-index --assume-unchanged
+    hidden = ! git ls-files -v | rg '^h'
+    unhide = update-index --no-assume-unchanged
+    unhide-all = update-index --really-refresh
