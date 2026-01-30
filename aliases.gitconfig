@@ -26,6 +26,9 @@
     amend = commit -a --amend --no-edit
     now = commit --amend --date=now --no-edit
 
+    # submodule
+    sm = submodule
+
     # assume-unchanged
     hide = update-index --assume-unchanged
     hidden = ! git ls-files -v | rg '^h'
