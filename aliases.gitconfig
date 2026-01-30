@@ -1,6 +1,15 @@
 [alias]
-    # status
+    # status & log
     st = status
+    ll = log \
+        --graph \
+        --topo-order \
+        --decorate \
+        --all \
+        --boundary \
+        --date=short \
+        --abbrev-commit \
+        --pretty=format:'%Cgreen%ad %Cred%h%Creset -%C(yellow)%d%Creset %s %Cblue[%aN]%Creset %Cblue%G?%Creset'
 
     # fetch
     f = fetch --all --verbose
