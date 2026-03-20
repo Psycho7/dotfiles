@@ -1,0 +1,30 @@
+#!/bin/bash
+# Replaces the chezmoi-managed block in git ignore, preserving everything else.
+
+BEGIN_MARKER='# BEGIN chezmoi managed'
+END_MARKER='# END chezmoi managed'
+
+existing=$(cat)
+
+managed=$(cat <<'BLOCK'
+# BEGIN chezmoi managed
+**/.claude/settings.local.json
+# END chezmoi managed
+BLOCK
+)
+
+# Strip existing managed block if present
+output=""
+in_block=0
+while IFS= read -r line; do
+  if [ "$line" = "$BEGIN_MARKER" ]; then
+    in_block=1
+  elif [ "$line" = "$END_MARKER" ]; then
+    in_block=0
+  elif [ $in_block -eq 0 ]; then
+    output="$output$line"$'\n'
+  fi
+done <<< "$existing"
+
+# Append managed block
+printf '%s\n%s\n' "$output" "$managed"

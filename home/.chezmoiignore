@@ -5,6 +5,7 @@ run_once_install_packages.ps1
 {{- if eq .chezmoi.os "windows" }}
 .config/fish
 run_once_install_packages.sh
+.claude
 {{- end }}
 
 # fish conf.d — machine-specific, managed outside chezmoi

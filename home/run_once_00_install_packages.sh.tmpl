@@ -3,7 +3,7 @@ set -e
 
 {{ if eq .chezmoi.os "darwin" -}}
 echo "Installing packages on macOS..."
-brew install ripgrep fd jq starship zoxide
+brew install fish ripgrep fd jq starship zoxide
 brew install --cask font-fira-code-nerd-font
 {{ end -}}
 
@@ -12,7 +12,7 @@ brew install --cask font-fira-code-nerd-font
 echo "Installing packages on Linux (Debian/Ubuntu)..."
 if command -v apt-get &> /dev/null; then
     sudo apt update
-    sudo apt install -y ripgrep fd-find jq
+    sudo apt install -y fish ripgrep fd-find jq
     [ ! -f /usr/bin/fd ] && sudo ln -s /usr/bin/fdfind /usr/bin/fd
 fi
 # Install starship

@@ -1,0 +1,32 @@
+#!/bin/bash
+# Merges managed fields into existing settings.json, preserving everything else.
+# Managed fields: env.DISABLE_AUTOUPDATER, attribution, permissions.allow (additive)
+
+existing=$(cat)
+
+if [ -z "$existing" ]; then
+    existing='{}'
+fi
+
+# Baseline permissions we always want present
+baseline_permissions='[
+  "Bash(wc:*)",
+  "Bash(find:*)",
+  "WebSearch",
+  "Bash(grep:*)",
+  "Bash(ls:*)",
+  "Bash(tac:*)",
+  "Bash(git checkout:*)",
+  "Bash(rg:*)",
+  "Bash(cat:*)",
+  "Bash(git log:*)",
+  "Bash(fd:*)",
+  "Bash(git show-ref:*)",
+  "Bash(git ls-tree:*)"
+]'
+
+echo "$existing" | jq --argjson baseline "$baseline_permissions" '
+  .env.DISABLE_AUTOUPDATER = "1" |
+  .attribution = {"commit": "", "pr": ""} |
+  .permissions.allow = ((.permissions.allow // []) + $baseline | unique)
+'
