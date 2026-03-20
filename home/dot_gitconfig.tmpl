@@ -1,6 +1,5 @@
 [include]
 	path = ~/.config/git/aliases.gitconfig
-	path = ~/.config/git/local.gitconfig
 
 [user]
 	name = {{ .name }}
@@ -8,9 +7,12 @@
 
 [credential]
 {{- if eq .chezmoi.os "darwin" }}
-	helper = {{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}/share/gcm-core/git-credential-manager
+	helper = /usr/local/bin/git-credential-manager
 {{- else if eq .chezmoi.os "linux" }}
 	helper = /usr/bin/git-credential-libsecret
 {{- else if eq .chezmoi.os "windows" }}
 	helper = manager
 {{- end }}
+
+[include]
+	path = ~/.config/git/local.gitconfig
