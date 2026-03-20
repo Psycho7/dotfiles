@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+{{ if eq .chezmoi.os "darwin" -}}
+echo "Installing packages on macOS..."
+brew install ripgrep fd jq starship zoxide
+brew install --cask font-fira-code-nerd-font
+{{ end -}}
+
+{{ if eq .chezmoi.os "linux" -}}
+# Note: Linux support targets Debian/Ubuntu (apt-get). Other distros not supported.
+echo "Installing packages on Linux (Debian/Ubuntu)..."
+if command -v apt-get &> /dev/null; then
+    sudo apt update
+    sudo apt install -y ripgrep fd-find jq
+    [ ! -f /usr/bin/fd ] && sudo ln -s /usr/bin/fdfind /usr/bin/fd
+fi
+# Install starship
+curl -sS https://starship.rs/install.sh | sh -s -- -y
+# Install zoxide
+curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+{{ end -}}
+
+echo "Packages installed successfully!"

@@ -1,0 +1,8 @@
+# Starship prompt
+Invoke-Expression (&starship init powershell)
+
+# Zoxide
+Invoke-Expression (& { (zoxide init powershell | Out-String) })
+
+# Add to PATH
+$env:PATH += ";$env:USERPROFILE\.local\bin"

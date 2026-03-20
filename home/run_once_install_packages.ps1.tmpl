@@ -1,0 +1,11 @@
+{{ if eq .chezmoi.os "windows" -}}
+Write-Host "Installing packages on Windows..."
+
+winget install --id BurntSushi.ripgrep.MSVC
+winget install --id sharkdp.fd
+winget install --id jqlang.jq
+winget install --id Starship.Starship
+winget install --id ajeetdsouza.zoxide
+
+Write-Host "Packages installed successfully!"
+{{ end -}}

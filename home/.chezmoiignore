@@ -1,0 +1,17 @@
+{{- if ne .chezmoi.os "windows" }}
+.config/powershell
+run_once_install_packages.ps1
+{{- end }}
+{{- if eq .chezmoi.os "windows" }}
+.config/fish
+run_once_install_packages.sh
+{{- end }}
+
+# fish conf.d — machine-specific, managed outside chezmoi
+.config/fish/conf.d
+
+# fish functions that are macOS-only
+{{- if ne .chezmoi.os "darwin" }}
+.config/fish/functions/tailscale.fish
+.config/fish/functions/ts.fish
+{{- end }}
