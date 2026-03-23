@@ -27,6 +27,10 @@
     amend = commit -a --amend --no-edit
     now = commit --amend --date=now --no-edit
 
+    # checkout
+    co = checkout
+    cob = checkout -b
+
     # submodule
     sm = submodule
 

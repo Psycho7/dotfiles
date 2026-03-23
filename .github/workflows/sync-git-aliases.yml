@@ -1,0 +1,28 @@
+name: Sync git aliases to Gist
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'home/dot_config/git/aliases.gitconfig'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update Gist
+        env:
+          GIST_ID: ${{ secrets.GIST_ID }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          content=$(cat home/dot_config/git/aliases.gitconfig)
+          payload=$(jq -n \
+            --arg content "$content" \
+            '{"files": {"aliases.gitconfig": {"content": $content}}}')
+          curl -sf -X PATCH \
+            -H "Authorization: token $GIST_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -d "$payload" \
+            "https://api.github.com/gists/$GIST_ID"
