@@ -19,10 +19,13 @@ User-wide defaults for all repositories.
 - Maintain thread/exception safety; ask if expectations are unclear.
 - Do not add/upgrade NuGet/vcpkg/Conan/etc. packages or new feeds without approval.
 
-## Agent dispatch
+## Agent Workflow
 - In Plan mode, write plans directly after gathering info — do not dispatch a Plan subagent.
+- Trust agent summaries for file contents and structure; only re-read files you will edit or where the summary is ambiguous.
 
 ## Tools
-- Use `fd` or `rg --files` instead of `tree`.
-- Prefer `rg` over `grep`, `fd` over `find`.
 - Use `jq` for JSON processing
+- Prefer built-in tools over Bash:
+  - Glob/Read (not `fd`, `find`, `cat`, `head`)
+  - Grep (not `rg`, `grep`)
+  - Edit/Write (not `sed`, `awk`, `>`)
