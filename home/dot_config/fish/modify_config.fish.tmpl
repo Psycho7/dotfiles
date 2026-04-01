@@ -24,6 +24,10 @@ set -a managed \
     'starship init fish | source' \
     'zoxide init fish | source'
 
+set -a managed 'abbr -a cz --position command chezmoi'
+set -a managed 'abbr -a ts --position command tailscale'
+
+
 set -a managed $END_MARKER
 
 # Strip existing managed block if present
