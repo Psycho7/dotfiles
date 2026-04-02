@@ -33,6 +33,7 @@
 
     # submodule
     sm = submodule
+    smu = submodule update --init --recursive
 
     # assume-unchanged
     hide = update-index --assume-unchanged
