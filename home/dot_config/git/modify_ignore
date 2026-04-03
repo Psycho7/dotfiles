@@ -27,4 +27,4 @@ while IFS= read -r line; do
 done <<< "$existing"
 
 # Append managed block
-printf '%s\n%s\n' "$output" "$managed"
+printf '%s%s\n' "$output" "$managed"

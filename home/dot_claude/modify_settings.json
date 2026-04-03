@@ -1,6 +1,6 @@
 #!/bin/bash
 # Merges managed fields into existing settings.json, preserving everything else.
-# Managed fields: env.DISABLE_AUTOUPDATER, attribution, permissions.allow (additive)
+# Managed fields: env.DISABLE_AUTOUPDATER, attribution, permissions.allow/ask/deny (additive)
 
 existing=$(cat)
 
@@ -8,25 +8,61 @@ if [ -z "$existing" ]; then
     existing='{}'
 fi
 
-# Baseline permissions we always want present
-baseline_permissions='[
-  "Bash(wc:*)",
-  "Bash(find:*)",
-  "WebSearch",
-  "Bash(grep:*)",
-  "Bash(ls:*)",
-  "Bash(tac:*)",
-  "Bash(git checkout:*)",
-  "Bash(rg:*)",
-  "Bash(cat:*)",
-  "Bash(git log:*)",
-  "Bash(fd:*)",
-  "Bash(git show-ref:*)",
-  "Bash(git ls-tree:*)"
+# Permissions we always want to prompt before running
+ask_permissions='[
+  "Bash(git push:*)",
+  "Bash(git reset:*)",
+  "Bash(git clean:*)",
+  "Bash(rm:*)"
 ]'
 
-echo "$existing" | jq --argjson baseline "$baseline_permissions" '
+# Permissions we always want denied
+deny_permissions='[
+  "Bash(sudo:*)"
+]'
+
+# Baseline permissions we always want present
+baseline_permissions='[
+  "WebSearch",
+  "Bash(ls:*)",
+  "Bash(rg:*)",
+  "Bash(fd:*)",
+  "Bash(wc:*)",
+  "Bash(jq:*)",
+  "Bash(which:*)",
+  "Bash(echo:*)",
+  "Bash(chezmoi diff:*)",
+  "Bash(chezmoi status:*)",
+  "Bash(git checkout:*)",
+  "Bash(git log:*)",
+  "Bash(git show-ref:*)",
+  "Bash(git ls-tree:*)",
+  "Bash(git status:*)",
+  "Bash(git diff:*)",
+  "Bash(git branch:*)",
+  "Bash(git remote:*)",
+  "Bash(git stash list:*)",
+  "Bash(git fetch:*)",
+  "Bash(dotnet build:*)",
+  "Bash(dotnet test:*)",
+  "Bash(dotnet run:*)",
+  "Bash(dotnet restore:*)",
+  "Bash(dotnet publish:*)",
+  "Bash(dotnet format:*)",
+  "Bash(dotnet clean:*)",
+  "Bash(dotnet pack:*)",
+  "Bash(dotnet add:*)",
+  "Bash(dotnet remove:*)",
+  "Bash(dotnet list:*)",
+  "Bash(dotnet watch:*)",
+  "Bash(dotnet tool:*)",
+  "Bash(dotnet new:*)"
+]'
+
+echo "$existing" | jq --argjson baseline "$baseline_permissions" --argjson ask "$ask_permissions" --argjson deny "$deny_permissions" '
   .env.DISABLE_AUTOUPDATER = "1" |
   .attribution = {"commit": "", "pr": ""} |
-  .permissions.allow = ((.permissions.allow // []) + $baseline | unique)
+  .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
+  .permissions.ask = ((.permissions.ask // []) + $ask | unique) |
+  .permissions.deny = ((.permissions.deny // []) + $deny | unique)
 '
