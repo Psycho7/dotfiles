@@ -1,49 +1,44 @@
-#!/usr/bin/env fish
+#!/bin/bash
+# Uses bash (not fish) because chezmoi runs modify scripts before fish is installed.
 # Replaces the chezmoi-managed block in config.fish, preserving everything else.
+set -e
 
-set BEGIN_MARKER '# BEGIN chezmoi managed'
-set END_MARKER '# END chezmoi managed'
+BEGIN_MARKER='# BEGIN chezmoi managed'
+END_MARKER='# END chezmoi managed'
 
-set existing (cat)
+existing=$(cat)
 
 # Build the managed block
-set managed $BEGIN_MARKER
+managed=()
+managed+=("$BEGIN_MARKER")
+{{- if eq .chezmoi.os "darwin" }}
+managed+=('if test -d /opt/homebrew')
+managed+=('    # Homebrew is installed on MacOS')
+managed+=('    /opt/homebrew/bin/brew shellenv | source')
+managed+=('end')
+managed+=('')
+{{- end }}
+managed+=('fish_add_path $HOME/.local/bin')
+managed+=('')
+managed+=('starship init fish | source')
+managed+=('zoxide init fish | source')
+managed+=('abbr -a cz --position command chezmoi')
+managed+=('abbr -a ts --position command tailscale')
+managed+=("$END_MARKER")
 
-{{ if eq .chezmoi.os "darwin" -}}
-set -a managed \
-    'if test -d /opt/homebrew' \
-    '    # Homebrew is installed on MacOS' \
-    '    /opt/homebrew/bin/brew shellenv | source' \
-    'end' \
-    ''
-{{ end -}}
-
-set -a managed \
-    'fish_add_path $HOME/.local/bin' \
-    '' \
-    'starship init fish | source' \
-    'zoxide init fish | source'
-
-set -a managed 'abbr -a cz --position command chezmoi'
-set -a managed 'abbr -a ts --position command tailscale'
-
-
-set -a managed $END_MARKER
-
-# Strip existing managed block if present
-set output
-set in_block 0
-for line in $existing
-    if test "$line" = "$BEGIN_MARKER"
-        set in_block 1
-    else if test "$line" = "$END_MARKER"
-        set in_block 0
-    else if test $in_block -eq 0
-        set -a output $line
-    end
-end
+# Strip existing managed block and output
+in_block=0
+while IFS= read -r line; do
+    if [ "$line" = "$BEGIN_MARKER" ]; then
+        in_block=1
+    elif [ "$line" = "$END_MARKER" ]; then
+        in_block=0
+    elif [ "$in_block" -eq 0 ]; then
+        printf '%s\n' "$line"
+    fi
+done <<< "$existing"
 
 # Append managed block
-set -a output $managed
-
-printf '%s\n' $output
+for line in "${managed[@]}"; do
+    printf '%s\n' "$line"
+done
