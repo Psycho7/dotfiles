@@ -2,8 +2,16 @@
 	path = ~/.config/git/aliases.gitconfig
 
 [user]
-	name = {{ .name | default "User" }}
-	email = {{ .email | default "user@example.com" }}
+{{- if hasKey . "name" }}
+	name = {{ .name }}
+{{- else }}
+	name = User
+{{- end }}
+{{- if hasKey . "email" }}
+	email = {{ .email }}
+{{- else }}
+	email = user@example.com
+{{- end }}
 
 [credential]
 {{- if eq .chezmoi.os "darwin" }}
