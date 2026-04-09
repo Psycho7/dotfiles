@@ -1,0 +1,109 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {
+        "id": "5f52b20d-f830-4eba-8d07-e2f1d723cc6b",
+        "type": "git-root-dir",
+        "metadata": {
+          "hideNoGit": "false"
+        },
+        "color": "brightYellow"
+      },
+      {
+        "id": "c3eb638e-a9b2-4f25-b6d3-440511e0ddcd",
+        "type": "git-worktree",
+        "rawValue": false,
+        "metadata": {
+          "hideNoGit": "true"
+        },
+        "color": "brightCyan"
+      },
+      {
+        "id": "5",
+        "type": "git-branch",
+        "rawValue": false,
+        "metadata": {
+          "hideNoGit": "true"
+        },
+        "color": "brightGreen"
+      },
+      {
+        "id": "7",
+        "type": "git-changes",
+        "metadata": {
+          "hideNoGit": "true"
+        },
+        "color": "brightCyan"
+      },
+      {
+        "id": "637dbf80-519f-42e5-a156-e98c8bd37795",
+        "type": "flex-separator",
+        "color": ""
+      },
+      {
+        "id": "c7160b06-4f59-48b7-94b4-0913d22eed5a",
+        "type": "claude-session-id",
+        "rawValue": true,
+        "color": "brightYellow"
+      }
+    ],
+    [
+      {
+        "id": "212f3d04-e300-4e41-adbd-c69525d6706c",
+        "type": "model",
+        "rawValue": true,
+        "color": "brightYellow"
+      },
+      {
+        "id": "9cf07a2f-2787-4829-a63f-be7e21086735",
+        "type": "context-bar",
+        "rawValue": true,
+        "color": "cyan"
+      },
+      {
+        "id": "6646d011-57a6-469f-bbbd-731492018dea",
+        "type": "flex-separator"
+      },
+      {
+        "id": "55669c7f-e362-451e-8a50-faeca7ad2c71",
+        "type": "session-usage",
+        "rawValue": false,
+        "color": "brightBlue"
+      },
+      {
+        "id": "3022b036-39e2-4726-b20e-e80bc671a991",
+        "type": "separator"
+      },
+      {
+        "id": "bb6a906f-77af-458b-8af6-ac42a6e1e3cb",
+        "type": "reset-timer",
+        "rawValue": false,
+        "color": "brightBlue"
+      }
+    ],
+    []
+  ],
+  "flexMode": "full-minus-40",
+  "compactThreshold": 60,
+  "colorLevel": 3,
+  "defaultPadding": " ",
+  "inheritSeparatorColors": false,
+  "globalBold": false,
+  "powerline": {
+    "enabled": false,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [],
+    "endCaps": [
+      "",
+      ""
+    ],
+    "theme": "monokai",
+    "autoAlign": false
+  }
+}
