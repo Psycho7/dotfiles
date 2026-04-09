@@ -11,17 +11,18 @@ User-wide defaults for all repositories.
 ## Documentation style
 - Keep docs concise. The user is an experienced developer; skip obvious environment/language basics.
 
-## Git & workflow
+## Git
 - No destructive git commands (reset --hard/clean/force-push) without explicit request; no history rewrites unless told. Avoid adding untracked/generated/binary artifacts; keep commits scoped/descriptive when asked.
-- Ask if unsure about staging/branching strategy.
 
 ## Coding practices
 - Maintain thread/exception safety; ask if expectations are unclear.
 - Do not add/upgrade NuGet/vcpkg/Conan/etc. packages or new feeds without approval.
 
 ## Agent Workflow
-- In Plan mode, write plans directly after gathering info — do not dispatch a Plan subagent.
-- Trust agent summaries for file contents and structure; only re-read files you will edit or where the summary is ambiguous.
+- Use the proxy-explore skill for all codebase exploration, including plan mode Phase 1 — it delegates to a faster model and preserves main context. The Explore subagent type is only a fallback when proxy-explore is unavailable.
+- Trust /proxy-explore for exploration summary and structure, do not re-explore.
+- For complex exploration, split the task into smaller pieces and spawn up to 3 subgents in parallel.
+- Only re-read files you will edit or where the summary is ambiguous.
 
 ## Tools
 - Use `jq` for JSON processing
