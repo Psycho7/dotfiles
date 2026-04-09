@@ -7,38 +7,81 @@ on:
 
 jobs:
   test-setup:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install chezmoi
+      - name: Install chezmoi (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
 
-      - name: Add chezmoi to PATH
+      - name: Install chezmoi (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '$HOME/.local/bin'"
+
+      - name: Add chezmoi to PATH (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      - name: Add chezmoi to PATH (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: echo "$HOME/.local/bin" | Out-File -Append "$env:GITHUB_PATH"
+
       - name: Run chezmoi init --apply
+        shell: bash
         run: |
           cd "$GITHUB_WORKSPACE"
-          chezmoi init --apply "$GITHUB_WORKSPACE"
+          chezmoi init --apply --exclude=scripts --promptDefaults "$GITHUB_WORKSPACE"
 
-      - name: Verify config files exist
+      - name: Verify config files exist (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           test -f "$HOME/.config/fish/config.fish" || { echo "FAIL: fish config missing"; exit 1; }
           test -f "$HOME/.gitconfig" || { echo "FAIL: gitconfig missing"; exit 1; }
           test -f "$HOME/.config/git/aliases.gitconfig" || { echo "FAIL: git aliases missing"; exit 1; }
 
-      - name: Verify fish config contains managed block
+      - name: Verify config files exist (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $profilePath = Join-Path $HOME "Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+          Test-Path $profilePath; if (-not (Test-Path $profilePath)) { Write-Error "FAIL: PowerShell profile missing"; exit 1 }
+          Test-Path "$HOME/.gitconfig"; if (-not (Test-Path "$HOME/.gitconfig")) { Write-Error "FAIL: gitconfig missing"; exit 1 }
+          Test-Path "$HOME/.config/git/aliases.gitconfig"; if (-not (Test-Path "$HOME/.config/git/aliases.gitconfig")) { Write-Error "FAIL: git aliases missing"; exit 1 }
+
+      - name: Verify fish config contains managed block (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           grep -q '# BEGIN chezmoi managed' "$HOME/.config/fish/config.fish" || { echo "FAIL: managed block missing"; exit 1; }
           grep -q 'starship init fish' "$HOME/.config/fish/config.fish" || { echo "FAIL: starship init missing"; exit 1; }
 
+      - name: Verify PowerShell profile contains managed block (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $profilePath = Join-Path $HOME "Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+          $content = Get-Content $profilePath -Raw
+          if ($content -notmatch 'BEGIN chezmoi managed') { Write-Error "FAIL: managed block missing"; exit 1 }
+          if ($content -notmatch 'starship init powershell') { Write-Error "FAIL: starship init missing"; exit 1 }
+
       - name: Verify gitconfig has user section
+        shell: bash
         run: |
           grep -q 'name =' "$HOME/.gitconfig" || { echo "FAIL: name missing"; exit 1; }
           grep -q 'email =' "$HOME/.gitconfig" || { echo "FAIL: email missing"; exit 1; }
 
       - name: Verify chezmoi apply is idempotent
+        shell: bash
         run: |
           diff_output=$(chezmoi diff 2>&1) || true
           if [ -n "$diff_output" ]; then
