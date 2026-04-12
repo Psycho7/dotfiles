@@ -34,7 +34,7 @@ foreach ($line in $existing) {
 
 # Trim trailing blank lines to avoid accumulation on repeated applies
 while ($output.Count -gt 0 -and $output[-1] -eq '') {
-  $output = $output[0..($output.Count - 2)]
+  $output = @($output | Select-Object -SkipLast 1)
 }
 
 # Add blank separator only if there is user content above the managed block
