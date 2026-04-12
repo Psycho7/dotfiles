@@ -50,7 +50,7 @@ The Claude `modify_settings.json` uses `jq` to additively merge baseline permiss
 
 - **Git**: `dot_gitconfig.tmpl` (identity + includes), `dot_config/git/aliases.gitconfig`, `dot_config/git/modify_ignore`
 - **Fish shell**: `dot_config/fish/modify_config.fish.tmpl` + functions in `dot_config/fish/functions/`
-- **PowerShell**: `dot_config/powershell/modify_Microsoft.PowerShell_profile.ps1`
+- **PowerShell**: `dot_config/powershell/modify_Microsoft.PowerShell_profile.ps1.ps1`
 - **Starship prompt**: `dot_config/starship.toml`
 - **Claude Code**: `dot_claude/CLAUDE.md`, `dot_claude/modify_settings.json`, `dot_claude/skills/`
 
