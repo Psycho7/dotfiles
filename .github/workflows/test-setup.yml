@@ -43,6 +43,11 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           chezmoi init --apply --promptDefaults "$GITHUB_WORKSPACE"
 
+      - name: Allow PowerShell scripts (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser -Force
+
       - name: Run chezmoi init --apply (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
