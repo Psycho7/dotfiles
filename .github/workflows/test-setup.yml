@@ -41,18 +41,14 @@ jobs:
         shell: bash
         run: |
           cd "$GITHUB_WORKSPACE"
-          chezmoi init --apply --exclude=scripts --promptDefaults "$GITHUB_WORKSPACE"
-          # Re-apply modify-managed files (excluded by --exclude=scripts above)
-          chezmoi apply ~/.config/fish/config.fish
+          chezmoi init --apply --promptDefaults "$GITHUB_WORKSPACE"
 
       - name: Run chezmoi init --apply (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           Set-Location "$env:GITHUB_WORKSPACE"
-          chezmoi init --apply --exclude=scripts --promptDefaults "$env:GITHUB_WORKSPACE"
-          # Re-apply modify-managed files (excluded by --exclude=scripts above)
-          chezmoi apply (Join-Path $HOME 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1')
+          chezmoi init --apply --promptDefaults "$env:GITHUB_WORKSPACE"
 
       - name: Verify config files exist (Unix)
         if: runner.os != 'Windows'
