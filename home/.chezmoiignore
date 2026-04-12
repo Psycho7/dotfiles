@@ -5,6 +5,7 @@ run_once_00_install_packages.ps1
 {{- end }}
 {{- if eq .chezmoi.os "windows" }}
 .config/fish
+.config/git/ignore
 run_once_00_install_packages.sh
 .claude
 {{- end }}
