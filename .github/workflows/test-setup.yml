@@ -41,14 +41,14 @@ jobs:
         shell: bash
         run: |
           cd "$GITHUB_WORKSPACE"
-          chezmoi init --apply --exclude=scripts --promptDefaults "$GITHUB_WORKSPACE"
+          chezmoi init --apply --exclude=run --promptDefaults "$GITHUB_WORKSPACE"
 
       - name: Run chezmoi init --apply (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           Set-Location "$env:GITHUB_WORKSPACE"
-          chezmoi init --apply --exclude=scripts --promptDefaults "$env:GITHUB_WORKSPACE"
+          chezmoi init --apply --exclude=run --promptDefaults "$env:GITHUB_WORKSPACE"
 
       - name: Verify config files exist (Unix)
         if: runner.os != 'Windows'
