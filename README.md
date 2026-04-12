@@ -11,9 +11,12 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply https://github.com/Psycho7/
 
 ### Windows (PowerShell)
 ```powershell
+winget install Microsoft.PowerShell
 winget install twpayne.chezmoi
 chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 ```
+
+> PowerShell 7 must be installed first — the install script runs as `.ps1` and requires `pwsh`.
 
 ## What's Included
 
