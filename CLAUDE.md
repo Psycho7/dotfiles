@@ -42,6 +42,10 @@ The Claude `modify_settings.json` uses `jq` to additively merge baseline permiss
 - Templates use `{{ if eq .chezmoi.os "darwin" }}` guards
 - `run_once_00_install_packages.sh.tmpl` handles macOS (Homebrew) and Linux (apt + manual installers); `.ps1.tmpl` handles Windows (winget)
 
+### CI / GitHub Actions
+
+- PowerShell `run:` values that start with `"` must use block scalar (`|`) — bare double-quoted YAML strings break on backslashes and `|` pipe characters.
+
 ### What's Managed
 
 - **Git**: `dot_gitconfig.tmpl` (identity + includes), `dot_config/git/aliases.gitconfig`, `dot_config/git/modify_ignore`

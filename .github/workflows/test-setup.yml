@@ -33,7 +33,8 @@ jobs:
       - name: Add chezmoi to PATH (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: "$env:USERPROFILE\.local\bin" | Out-File -Append "$env:GITHUB_PATH"
+        run: |
+          "$env:USERPROFILE\.local\bin" | Out-File -Append "$env:GITHUB_PATH"
 
       - name: Run chezmoi init --apply (Unix)
         if: runner.os != 'Windows'
