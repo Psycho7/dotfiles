@@ -9,10 +9,10 @@ $existing = @($input)
 $managed = @(
   $BeginMarker
   '# Starship prompt'
-  'Invoke-Expression (&starship init powershell)'
+  'if (Get-Command starship -ErrorAction SilentlyContinue) { Invoke-Expression (&starship init powershell) }'
   ''
   '# Zoxide'
-  'Invoke-Expression (& { (zoxide init powershell | Out-String) })'
+  'if (Get-Command zoxide -ErrorAction SilentlyContinue) { Invoke-Expression (& { (zoxide init powershell | Out-String) }) }'
   ''
   '# Add to PATH'
   '$env:PATH += ";$env:USERPROFILE\.local\bin"'
@@ -32,8 +32,15 @@ foreach ($line in $existing) {
   }
 }
 
-# Append managed block
-$output += ''
+# Trim trailing blank lines to avoid accumulation on repeated applies
+while ($output.Count -gt 0 -and $output[-1] -eq '') {
+  $output = $output[0..($output.Count - 2)]
+}
+
+# Add blank separator only if there is user content above the managed block
+if ($output.Count -gt 0) {
+  $output += ''
+}
 $output += $managed
 
 $output | ForEach-Object { $_ }
