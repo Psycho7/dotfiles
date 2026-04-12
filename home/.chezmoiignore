@@ -1,5 +1,4 @@
 {{- if ne .chezmoi.os "windows" }}
-.config/powershell
 Documents/PowerShell
 00_install_packages.ps1
 {{- end }}
