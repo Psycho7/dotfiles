@@ -1,7 +1,6 @@
 {{ if eq .chezmoi.os "windows" -}}
 Write-Host "Installing packages on Windows..."
 
-winget install --accept-source-agreements --accept-package-agreements --id Microsoft.PowerShell
 winget install --accept-source-agreements --accept-package-agreements --id BurntSushi.ripgrep.MSVC
 winget install --accept-source-agreements --accept-package-agreements --id sharkdp.fd
 winget install --accept-source-agreements --accept-package-agreements --id jqlang.jq
