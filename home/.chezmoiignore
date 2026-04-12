@@ -1,10 +1,11 @@
 {{- if ne .chezmoi.os "windows" }}
 .config/powershell
-run_once_install_packages.ps1
+Documents/PowerShell
+run_once_00_install_packages.ps1
 {{- end }}
 {{- if eq .chezmoi.os "windows" }}
 .config/fish
-run_once_install_packages.sh
+run_once_00_install_packages.sh
 .claude
 {{- end }}
 
