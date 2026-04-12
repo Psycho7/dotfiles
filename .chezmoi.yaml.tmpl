@@ -4,3 +4,14 @@
 data:
   email: {{ $email | quote }}
   name: {{ $name | quote }}
+{{- if eq .chezmoi.os "windows" }}
+
+interpreters:
+  ps1:
+    command: pwsh
+    args:
+      - "-NoLogo"
+      - "-NoProfile"
+      - "-NonInteractive"
+      - "-File"
+{{- end }}
