@@ -26,5 +26,8 @@ printf '%s' $prompt | glm -p --model Haiku $add_dir_args \
 set glm_status $status
 if test $glm_status -ne 0
     echo "zai-delegate: GLM exited with code $glm_status" >&2
+    date +%s > ~/.claude/.zai-delegate-failed
+else
+    rm -f ~/.claude/.zai-delegate-failed
 end
 exit $glm_status

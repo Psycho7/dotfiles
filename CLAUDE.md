@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Dotfiles managed with [chezmoi](https://www.chezmoi.io/). The chezmoi source root is `home/` (per `.chezmoiroot`), which maps to `$HOME` on the target machine.
 
+Use the `chezmoi` skill when creating or modifying chezmoi-managed files — it covers file type selection, template syntax, modify scripts, cross-platform handling, and `.chezmoiignore` configuration.
+
 ## Key Commands
 
 ```bash
@@ -29,6 +31,7 @@ chezmoi state delete-bucket --bucket=scriptState && chezmoi apply
 | `.tmpl` | Go template; variables like `{{ .chezmoi.os }}`, `{{ .email }}` |
 | `modify_` | Script that reads existing file on stdin, outputs merged result to stdout |
 | `run_once_` | Script that runs once on first `chezmoi apply` (tracked by content hash) |
+| `executable_` | File is installed with executable permission |
 
 ### Modify Scripts Pattern
 
@@ -38,7 +41,7 @@ The Claude `modify_settings.json` uses `jq` to additively merge baseline permiss
 
 ### Platform Handling
 
-- `home/.chezmoiignore` excludes platform-specific files (fish/Tailscale functions on Windows; PowerShell on macOS/Linux)
+- `home/.chezmoiignore` excludes platform-specific files (PowerShell on non-Windows; fish/git-ignore/Claude on Windows; Tailscale fish functions on non-macOS; fish `conf.d` everywhere)
 - Templates use `{{ if eq .chezmoi.os "darwin" }}` guards
 - `run_once_00_install_packages.sh.tmpl` handles macOS (Homebrew) and Linux (apt + manual installers); `.ps1.tmpl` handles Windows (winget)
 
@@ -56,4 +59,4 @@ The Claude `modify_settings.json` uses `jq` to additively merge baseline permiss
 
 ### What's Excluded
 
-Per the memory for this project: no work configs, conda, SSH keys, or linuxbrew.
+Work configs, conda, SSH keys, and linuxbrew are intentionally not managed.

@@ -21,7 +21,7 @@ User-wide defaults for all repositories.
 ## Agent Workflow
 - Use the proxy-explore skill for all codebase exploration, including plan mode Phase 1 — it delegates to a faster model and preserves main context. The Explore subagent type is only a fallback when proxy-explore is unavailable.
 - Trust /proxy-explore for exploration summary and structure, do not re-explore.
-- For complex exploration, split the task into smaller pieces and spawn up to 3 subgents in parallel.
+- For complex exploration, split the task into smaller pieces and spawn up to 3 subagents in parallel.
 - Only re-read files you will edit or where the summary is ambiguous.
 
 ## Tools
