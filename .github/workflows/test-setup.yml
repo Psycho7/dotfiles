@@ -33,13 +33,21 @@ jobs:
       - name: Add chezmoi to PATH (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: echo "$HOME/.local/bin" | Out-File -Append "$env:GITHUB_PATH"
+        run: "$env:USERPROFILE\.local\bin" | Out-File -Append "$env:GITHUB_PATH"
 
-      - name: Run chezmoi init --apply
+      - name: Run chezmoi init --apply (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           cd "$GITHUB_WORKSPACE"
           chezmoi init --apply --exclude=scripts --promptDefaults "$GITHUB_WORKSPACE"
+
+      - name: Run chezmoi init --apply (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Set-Location "$env:GITHUB_WORKSPACE"
+          chezmoi init --apply --exclude=scripts --promptDefaults "$env:GITHUB_WORKSPACE"
 
       - name: Verify config files exist (Unix)
         if: runner.os != 'Windows'
@@ -80,7 +88,8 @@ jobs:
           grep -q 'name =' "$HOME/.gitconfig" || { echo "FAIL: name missing"; exit 1; }
           grep -q 'email =' "$HOME/.gitconfig" || { echo "FAIL: email missing"; exit 1; }
 
-      - name: Verify chezmoi apply is idempotent
+      - name: Verify chezmoi apply is idempotent (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           diff_output=$(chezmoi diff --exclude=scripts 2>&1) || true
@@ -89,3 +98,13 @@ jobs:
             echo "$diff_output"
             exit 1
           fi
+
+      - name: Verify chezmoi apply is idempotent (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $diff_output = chezmoi diff --exclude=scripts 2>&1
+          if ($diff_output) {
+            Write-Error "FAIL: chezmoi apply not idempotent`n$diff_output"
+            exit 1
+          }
