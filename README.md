@@ -26,9 +26,13 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 - Starship prompt
 - Claude Code configuration
 
-## Related
+## Keeping Up to Date
 
-- [vimrc](https://github.com/Psycho7/vimrc) - VIM configuration (separate repo)
+```bash
+chezmoi update    # Pull from remote and apply
+chezmoi diff      # Preview pending changes
+chezmoi apply     # Apply without pulling
+```
 
 ## Manual Steps After Bootstrap
 
@@ -36,3 +40,14 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 2. Configure SSH keys for GitHub, etc.
 3. Add machine-specific Claude permissions if needed
 4. Set up VIM using the separate vimrc repo
+
+## Related
+
+- [vimrc](https://github.com/Psycho7/vimrc) - VIM configuration (separate repo)
+
+## Attribution
+
+Claude Code setup inspired by:
+
+- [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) (MIT License)
+- [centminmod/my-claude-code-setup](https://github.com/centminmod/my-claude-code-setup) ([MIT License](https://github.com/centminmod/my-claude-code-setup/blob/master/LICENSE))
