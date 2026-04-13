@@ -1,0 +1,63 @@
+name: Test dotfiles (Windows)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test-setup:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        shell: pwsh
+        run: iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b '$HOME/.local/bin'"
+
+      - name: Add chezmoi to PATH
+        shell: pwsh
+        run: |
+          "$env:USERPROFILE\.local\bin" | Out-File -Append "$env:GITHUB_PATH"
+
+      - name: Allow PowerShell scripts
+        shell: pwsh
+        run: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser -Force
+
+      - name: Run chezmoi init --apply
+        shell: pwsh
+        run: |
+          Set-Location "$env:GITHUB_WORKSPACE"
+          chezmoi init --apply --promptDefaults "$env:GITHUB_WORKSPACE"
+
+      - name: Verify config files exist
+        shell: pwsh
+        run: |
+          $profilePath = Join-Path $HOME "Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+          if (-not (Test-Path $profilePath)) { Write-Error "FAIL: PowerShell profile missing"; exit 1 }
+          if (-not (Test-Path "$HOME/.gitconfig")) { Write-Error "FAIL: gitconfig missing"; exit 1 }
+          if (-not (Test-Path "$HOME/.config/git/aliases.gitconfig")) { Write-Error "FAIL: git aliases missing"; exit 1 }
+
+      - name: Verify PowerShell profile contains managed block
+        shell: pwsh
+        run: |
+          $profilePath = Join-Path $HOME "Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+          $content = Get-Content $profilePath -Raw
+          if ($content -notmatch 'BEGIN chezmoi managed') { Write-Error "FAIL: managed block missing"; exit 1 }
+          if ($content -notmatch 'starship init powershell') { Write-Error "FAIL: starship init missing"; exit 1 }
+
+      - name: Verify gitconfig has user section
+        shell: pwsh
+        run: |
+          if (-not (Select-String -Path "$HOME/.gitconfig" -Pattern 'name =' -Quiet)) { Write-Error "FAIL: name missing"; exit 1 }
+          if (-not (Select-String -Path "$HOME/.gitconfig" -Pattern 'email =' -Quiet)) { Write-Error "FAIL: email missing"; exit 1 }
+
+      - name: Verify chezmoi apply is idempotent
+        shell: pwsh
+        run: |
+          $diff_output = chezmoi diff --exclude=scripts 2>&1
+          if ($diff_output) {
+            Write-Error "FAIL: chezmoi apply not idempotent`n$diff_output"
+            exit 1
+          }

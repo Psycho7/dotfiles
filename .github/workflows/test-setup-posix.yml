@@ -1,0 +1,59 @@
+name: Test dotfiles (POSIX)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test-setup:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        shell: bash
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+
+      - name: Add chezmoi to PATH
+        shell: bash
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run chezmoi init --apply
+        shell: bash
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          chezmoi init --apply --promptDefaults "$GITHUB_WORKSPACE"
+
+      - name: Verify config files exist
+        shell: bash
+        run: |
+          test -f "$HOME/.config/fish/config.fish" || { echo "FAIL: fish config missing"; exit 1; }
+          test -f "$HOME/.gitconfig" || { echo "FAIL: gitconfig missing"; exit 1; }
+          test -f "$HOME/.config/git/aliases.gitconfig" || { echo "FAIL: git aliases missing"; exit 1; }
+
+      - name: Verify fish config contains managed block
+        shell: bash
+        run: |
+          grep -q '# BEGIN chezmoi managed' "$HOME/.config/fish/config.fish" || { echo "FAIL: managed block missing"; exit 1; }
+          grep -q 'starship init fish' "$HOME/.config/fish/config.fish" || { echo "FAIL: starship init missing"; exit 1; }
+
+      - name: Verify gitconfig has user section
+        shell: bash
+        run: |
+          grep -q 'name =' "$HOME/.gitconfig" || { echo "FAIL: name missing"; exit 1; }
+          grep -q 'email =' "$HOME/.gitconfig" || { echo "FAIL: email missing"; exit 1; }
+
+      - name: Verify chezmoi apply is idempotent
+        shell: bash
+        run: |
+          diff_output=$(chezmoi diff --exclude=scripts 2>&1) || true
+          if [ -n "$diff_output" ]; then
+            echo "FAIL: chezmoi apply not idempotent"
+            echo "$diff_output"
+            exit 1
+          fi
