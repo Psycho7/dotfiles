@@ -57,3 +57,63 @@ jobs:
             echo "$diff_output"
             exit 1
           fi
+
+  snapshot-rendered:
+    if: github.event_name == 'push'
+    needs: test-setup
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        shell: bash
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+
+      - name: Add chezmoi to PATH
+        shell: bash
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run chezmoi init --apply
+        shell: bash
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          chezmoi init --apply --promptDefaults "$GITHUB_WORKSPACE"
+
+      - name: Set up SSH for dev-environment
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEV_ENV_DEPLOY_KEY }}
+
+      - name: Clone dev-environment
+        shell: bash
+        run: git clone --depth 1 "git@github.com:${GITHUB_REPOSITORY_OWNER}/dev-environment.git" "$RUNNER_TEMP/dev-environment"
+
+      - name: Collect rendered files
+        shell: bash
+        run: |
+          rm -rf "$RUNNER_TEMP/dev-environment/home"
+          while IFS= read -r src; do
+            [ -f "$src" ] || continue
+            rel="${src#"$HOME/"}"
+            dest="$RUNNER_TEMP/dev-environment/home/$rel"
+            mkdir -p "$(dirname "$dest")"
+            cp "$src" "$dest"
+          done < <(chezmoi managed --path-style absolute)
+
+      - name: Commit and push snapshot
+        shell: bash
+        run: |
+          cd "$RUNNER_TEMP/dev-environment"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add home/
+          if git diff --cached --quiet; then
+            echo "No changes to snapshot, skipping push"
+            exit 0
+          fi
+          SHORT_SHA="${GITHUB_SHA::7}"
+          git commit \
+            -m "Snapshot from dotfiles@${SHORT_SHA}" \
+            -m "Source: https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          git push origin HEAD
