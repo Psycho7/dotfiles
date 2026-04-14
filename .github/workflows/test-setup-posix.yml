@@ -78,7 +78,17 @@ jobs:
         shell: bash
         run: |
           cd "$GITHUB_WORKSPACE"
-          chezmoi init --apply --promptDefaults "$GITHUB_WORKSPACE"
+          chezmoi init --apply \
+            --promptString email=chujie.zeng@gmail.com \
+            --promptString 'name=Chujie Zeng' \
+            "$GITHUB_WORKSPACE"
+
+      - name: Render install script
+        shell: bash
+        run: |
+          chezmoi execute-template \
+            < "$GITHUB_WORKSPACE/home/run_once_00_install_packages.sh.tmpl" \
+            > "$RUNNER_TEMP/install-packages.sh"
 
       - name: Set up SSH for dev-environment
         uses: webfactory/ssh-agent@v0.9.0
@@ -100,6 +110,7 @@ jobs:
             mkdir -p "$(dirname "$dest")"
             cp "$src" "$dest"
           done < <(chezmoi managed --path-style absolute)
+          cp "$RUNNER_TEMP/install-packages.sh" "$RUNNER_TEMP/dev-environment/install-packages.sh"
 
       - name: Commit and push snapshot
         shell: bash
@@ -107,7 +118,7 @@ jobs:
           cd "$RUNNER_TEMP/dev-environment"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add home/
+          git add home/ install-packages.sh
           if git diff --cached --quiet; then
             echo "No changes to snapshot, skipping push"
             exit 0
