@@ -55,6 +55,21 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+### 5. Write First, Simplify Later
+
+**Correctness before conciseness. Optimize in batch, not inline.**
+
+During implementation:
+- Prioritize working code. Duplication and verbosity are acceptable in-progress.
+- Do not self-optimize mid-iteration while requirements are shifting or bugs are being fixed.
+- Do not re-invent the wheel. Use existing functions, utilities, and tools already available in the codebase or project dependencies before writing new ones.
+
+Run simplification only at natural completion boundaries:
+- A module, feature, or full plan is functionally complete and stable.
+- All relevant tests pass.
+
+Skip simplification entirely for throwaway, exploratory, or prototype code.
+
 ## Documentation
 - The user is an experienced developer; skip obvious basics in explanations and docs.
 - Default to Markdown format when writing documents unless another format is specified.
