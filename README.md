@@ -24,7 +24,19 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 - Fish shell config (macOS/Linux)
 - PowerShell profile (Windows)
 - Starship prompt
-- Claude Code configuration
+- Claude Code configuration (optional, macOS/Linux only)
+
+## Configuration Options
+
+During `chezmoi init`, you'll be prompted:
+
+| Prompt | Default | Description |
+|---|---|---|
+| Email address | `user@example.com` | Git identity |
+| Full name | `User` | Git identity |
+| Use Claude Code | `true` | Deploy Claude Code config, skills, ccstatusline (macOS/Linux only; always off on Windows) |
+
+To change after initial setup, re-run `chezmoi init`.
 
 ## Keeping Up to Date
 

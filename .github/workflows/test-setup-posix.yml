@@ -30,6 +30,7 @@ jobs:
           chezmoi init --apply \
             --promptString 'Email address=chujie.zeng@gmail.com' \
             --promptString 'Full name=Chujie Zeng' \
+            --promptBool 'Use Claude Code=false' \
             "$GITHUB_WORKSPACE"
 
       - name: Verify config files exist
@@ -84,7 +85,14 @@ jobs:
           chezmoi init --apply \
             --promptString 'Email address=chujie.zeng@gmail.com' \
             --promptString 'Full name=Chujie Zeng' \
+            --promptBool 'Use Claude Code=true' \
             "$GITHUB_WORKSPACE"
+
+      - name: Verify Claude files exist
+        shell: bash
+        run: |
+          test -d "$HOME/.claude" || { echo "FAIL: .claude dir missing"; exit 1; }
+          test -f "$HOME/.config/ccstatusline/settings.json" || { echo "FAIL: ccstatusline missing"; exit 1; }
 
       - name: Render install script
         shell: bash

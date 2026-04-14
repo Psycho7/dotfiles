@@ -22,3 +22,9 @@ curl -sS https://starship.rs/install.sh | sh -s -- -y
 curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 echo "Packages installed successfully!"
 {{ end -}}
+
+{{ if .useClaude -}}
+# Install Claude Code
+curl -fsSL https://claude.ai/install.sh | bash
+echo "Claude Code installed successfully!"
+{{ end -}}

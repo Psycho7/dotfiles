@@ -1,9 +1,14 @@
 {{- $email := promptStringOnce . "email" "Email address" "user@example.com" -}}
 {{- $name := promptStringOnce . "name" "Full name" "User" -}}
+{{- $useClaude := false -}}
+{{- if ne .chezmoi.os "windows" -}}
+{{-   $useClaude = promptBoolOnce . "useClaude" "Use Claude Code" true -}}
+{{- end }}
 
 data:
   email: {{ $email | quote }}
   name: {{ $name | quote }}
+  useClaude: {{ $useClaude }}
 {{- if eq .chezmoi.os "windows" }}
 
 interpreters:

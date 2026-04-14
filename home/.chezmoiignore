@@ -6,7 +6,13 @@ Documents/PowerShell
 .config/fish
 .config/git/ignore
 00_install_packages.sh
+{{- end }}
+
+# Claude Code — disabled via useClaude=false or on Windows
+{{- if not .useClaude }}
 .claude
+.config/ccstatusline
+.config/fish/functions/glm.fish
 {{- end }}
 
 # fish conf.d — machine-specific, managed outside chezmoi
