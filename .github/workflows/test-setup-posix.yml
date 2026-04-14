@@ -27,7 +27,10 @@ jobs:
         shell: bash
         run: |
           cd "$GITHUB_WORKSPACE"
-          chezmoi init --apply --promptDefaults "$GITHUB_WORKSPACE"
+          chezmoi init --apply \
+            --promptString email=chujie.zeng@gmail.com \
+            --promptString 'name=Chujie Zeng' \
+            "$GITHUB_WORKSPACE"
 
       - name: Verify config files exist
         shell: bash
