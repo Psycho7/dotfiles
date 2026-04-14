@@ -28,8 +28,8 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE"
           chezmoi init --apply \
-            --promptString email=chujie.zeng@gmail.com \
-            --promptString 'name=Chujie Zeng' \
+            --promptString 'Email address=chujie.zeng@gmail.com' \
+            --promptString 'Full name=Chujie Zeng' \
             "$GITHUB_WORKSPACE"
 
       - name: Verify config files exist
@@ -82,8 +82,8 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE"
           chezmoi init --apply \
-            --promptString email=chujie.zeng@gmail.com \
-            --promptString 'name=Chujie Zeng' \
+            --promptString 'Email address=chujie.zeng@gmail.com' \
+            --promptString 'Full name=Chujie Zeng' \
             "$GITHUB_WORKSPACE"
 
       - name: Render install script
