@@ -1,6 +1,6 @@
 #!/bin/bash
 # Merges managed fields into existing settings.json, preserving everything else.
-# Managed fields: env.DISABLE_AUTOUPDATER, attribution, permissions.allow/ask/deny (additive), statusLine
+# Managed fields: env.DISABLE_AUTOUPDATER, attribution, permissions.allow/ask/deny (additive), statusLine, showClearContextOnPlanAccept
 
 existing=$(cat)
 
@@ -63,6 +63,7 @@ echo "$existing" | jq --argjson baseline "$baseline_permissions" --argjson ask "
   .env.DISABLE_AUTOUPDATER = "1" |
   .attribution = {"commit": "", "pr": ""} |
   .statusLine = {"type": "command", "command": "bunx -y ccstatusline@latest", "padding": 0} |
+  .showClearContextOnPlanAccept = true |
   .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
   .permissions.ask = ((.permissions.ask // []) + $ask | unique) |
   .permissions.deny = ((.permissions.deny // []) + $deny | unique)
