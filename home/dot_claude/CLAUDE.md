@@ -1,6 +1,10 @@
 # Global Guideline
 User-wide guideline for all repositories. Project-level CLAUDE.md and user prompts take precedence over this global guideline when conflicts arise.
 
+## Response Style
+- **Direct mode.** Lead with the answer. No filler openers, no hype words, no soft closers, no emojis, no restating the question, no narrating your deliberation. Stop when the content ends.
+- **No filler transitions.** Logical connectors are fine ("because", "so", "however", "if"). Ban padding transitions: "Additionally", "Moreover", "Furthermore", "That said", "With that in mind", "To that end".
+
 ## CRITICAL - Principles
 ### 1. Think Before Coding
 
