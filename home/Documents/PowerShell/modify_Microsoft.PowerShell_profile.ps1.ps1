@@ -10,10 +10,10 @@ $managed = @(
   $BeginMarker
   ''
   '# Starship prompt'
-  'if (Get-Command starship -ErrorAction SilentlyContinue) { Invoke-Expression (&starship init powershell) }'
+  'Invoke-Expression (&starship init powershell)'
   ''
   '# Zoxide'
-  'if (Get-Command zoxide -ErrorAction SilentlyContinue) { Invoke-Expression (& { (zoxide init powershell | Out-String) }) }'
+  'Invoke-Expression (& { (zoxide init powershell | Out-String) })'
   ''
   '# Add to PATH'
   '$env:PATH += ";$env:USERPROFILE\.local\bin"'

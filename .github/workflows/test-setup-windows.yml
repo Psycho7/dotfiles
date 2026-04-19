@@ -31,6 +31,19 @@ jobs:
           Set-Location "$env:GITHUB_WORKSPACE"
           chezmoi init --apply --promptDefaults "$env:GITHUB_WORKSPACE"
 
+      - name: Refresh PATH from registry after winget install
+        shell: pwsh
+        run: |
+          $userPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
+          $machinePath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
+          "$machinePath;$userPath" -split ';' | Where-Object { $_ } | Sort-Object -Unique | Out-File -Append "$env:GITHUB_PATH"
+
+      - name: Verify starship and zoxide are on PATH
+        shell: pwsh
+        run: |
+          if (-not (Get-Command starship -ErrorAction SilentlyContinue)) { Write-Error "FAIL: starship not on PATH after install"; exit 1 }
+          if (-not (Get-Command zoxide -ErrorAction SilentlyContinue)) { Write-Error "FAIL: zoxide not on PATH after install"; exit 1 }
+
       - name: Verify config files exist
         shell: pwsh
         run: |
