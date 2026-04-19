@@ -31,10 +31,12 @@ jobs:
           Set-Location "$env:GITHUB_WORKSPACE"
           chezmoi init --apply --promptDefaults "$env:GITHUB_WORKSPACE"
 
-      - name: Add winget shim directory to PATH
+      - name: Refresh PATH from registry after winget install
         shell: pwsh
         run: |
-          "$env:LOCALAPPDATA\Microsoft\WinGet\Links" | Out-File -Append "$env:GITHUB_PATH"
+          $userPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
+          $machinePath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
+          "$machinePath;$userPath" -split ';' | Where-Object { $_ } | Sort-Object -Unique | Out-File -Append "$env:GITHUB_PATH"
 
       - name: Verify starship and zoxide are on PATH
         shell: pwsh
