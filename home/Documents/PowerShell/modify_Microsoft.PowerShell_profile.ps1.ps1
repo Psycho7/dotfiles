@@ -8,6 +8,7 @@ $existing = @($input)
 
 $managed = @(
   $BeginMarker
+  ''
   '# Starship prompt'
   'if (Get-Command starship -ErrorAction SilentlyContinue) { Invoke-Expression (&starship init powershell) }'
   ''
@@ -16,6 +17,10 @@ $managed = @(
   ''
   '# Add to PATH'
   '$env:PATH += ";$env:USERPROFILE\.local\bin"'
+  ''
+  '# PowerShell config'
+  'Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete'
+  ''
   $EndMarker
 )
 
