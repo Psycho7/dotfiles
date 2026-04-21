@@ -1,6 +1,6 @@
 # Platform use cases (see README "Target Use Cases"):
 #   macOS   — full desktop dev surface
-#   Windows — daily use / gaming / partial dev; minimal surface, no fish / fonts / Claude
+#   Windows — daily use / partial dev; minimal surface, no fish / fonts / Claude
 #   Linux   — headless WSL or VM; no GUI-only items
 {{- if ne .chezmoi.os "windows" }}
 Documents/PowerShell

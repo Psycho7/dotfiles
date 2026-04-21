@@ -28,7 +28,7 @@ chezmoi state delete-bucket --bucket=scriptState && chezmoi apply
 Each supported OS has a distinct intended use case. The current `.chezmoiignore` rules, install scripts, and prompt defaults all encode these assumptions — respect them when adding or modifying anything platform-specific.
 
 - **macOS** — primary dev + daily-driver desktop. Full surface: fish + functions, Nerd Font, Claude Code, Tailscale helpers, GUI-adjacent tooling. Desktop-dev additions are in scope.
-- **Windows** — daily use, gaming, *partial* dev. Keep the surface minimal: PowerShell profile + a short winget CLI toolchain. Do not add fish, Nerd Fonts, or Claude Code. Prefer winget over manual installers.
+- **Windows** — daily use, *partial* dev. Keep the surface minimal: PowerShell profile + a short winget CLI toolchain. Do not add fish, Nerd Fonts, or Claude Code. Prefer winget over manual installers.
 - **Linux (Debian/Ubuntu)** — **always headless** (WSL or a VM without a desktop environment). CLI + fish + Claude Code only. Do not add Nerd Fonts, GUI apps, desktop-only helpers, or user-level GUI systemd services. Tailscale fish helpers remain macOS-only because the macOS box is the Tailscale node in this setup.
 
 When in doubt, ask before expanding a platform's surface beyond what is listed above.

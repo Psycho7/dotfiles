@@ -9,7 +9,7 @@ See [dev-environment](https://github.com/Psycho7/dev-environment) for rendered d
 The config surface is deliberately different per platform, matching how each machine is actually used:
 
 - **macOS** — primary daily driver and dev machine with a full desktop environment. Full config: fish + functions, Nerd Font, Claude Code, Tailscale helpers.
-- **Windows** — daily use, gaming, and *partial* dev work. PowerShell profile and a small CLI toolchain (ripgrep, fd, jq, starship, zoxide). Fish, Nerd Font, and Claude Code are intentionally not deployed.
+- **Windows** — daily use and *partial* dev work. PowerShell profile and a small CLI toolchain (ripgrep, fd, jq, starship, zoxide). Fish, Nerd Font, and Claude Code are intentionally not deployed.
 - **Linux (Debian/Ubuntu)** — WSL or a headless VM (no desktop environment assumed). CLI toolchain + fish + Claude Code. No GUI-dependent items; fonts are expected to come from the host terminal (Windows Terminal for WSL, or the host's terminal emulator for a VM).
 
 ## Quick Start
@@ -65,7 +65,7 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 | [starship](https://starship.rs/) | `Starship.Starship` |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | `ajeetdsouza.zoxide` |
 
-> Windows is treated as a daily-use / gaming box with partial dev work. PowerShell is the shell; fish, Nerd Fonts, and Claude Code are intentionally skipped to keep the surface minimal.
+> Windows is treated as a daily-use box with partial dev work. PowerShell is the shell; fish, Nerd Fonts, and Claude Code are intentionally skipped to keep the surface minimal.
 
 
 ## Configuration Options
@@ -76,7 +76,7 @@ During `chezmoi init`, you'll be prompted:
 |---|---|---|
 | Email address | `user@example.com` | Git identity |
 | Full name | `User` | Git identity |
-| Use Claude Code | `true` | Deploy Claude Code config, skills, ccstatusline. Defaults to `true` on macOS and Linux (both targeted at dev work, including WSL/VM); always `false` on Windows (daily-use / gaming box) |
+| Use Claude Code | `true` | Deploy Claude Code config, skills, ccstatusline. Defaults to `true` on macOS and Linux (both targeted at dev work, including WSL/VM); always `false` on Windows (daily-use box) |
 
 To change after initial setup, re-run `chezmoi init`.
 
