@@ -9,7 +9,7 @@ echo "Packages installed successfully!"
 {{ end -}}
 
 {{ if eq .chezmoi.os "linux" -}}
-# Note: Linux support targets Debian/Ubuntu (apt-get). Other distros not supported.
+# Linux target is headless (WSL or VM on Debian/Ubuntu) — no Nerd Font install; host terminal handles fonts.
 echo "Installing packages on Linux (Debian/Ubuntu)..."
 if command -v apt-get &> /dev/null; then
     sudo apt update
