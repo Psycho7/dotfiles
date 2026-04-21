@@ -23,6 +23,16 @@ chezmoi state delete-bucket --bucket=scriptState && chezmoi apply
 
 ## Architecture
 
+### Platform Use Cases
+
+Each supported OS has a distinct intended use case. The current `.chezmoiignore` rules, install scripts, and prompt defaults all encode these assumptions — respect them when adding or modifying anything platform-specific.
+
+- **macOS** — primary dev + daily-driver desktop. Full surface: fish + functions, Nerd Font, Claude Code, Tailscale helpers, GUI-adjacent tooling. Desktop-dev additions are in scope.
+- **Windows** — daily use, *partial* dev. Keep the surface minimal: PowerShell profile + a short winget CLI toolchain. Do not add fish, Nerd Fonts, or Claude Code. Prefer winget over manual installers.
+- **Linux (Debian/Ubuntu)** — **always headless** (WSL or a VM without a desktop environment). CLI + fish + Claude Code only. Do not add Nerd Fonts, GUI apps, desktop-only helpers, or user-level GUI systemd services. Tailscale fish helpers remain macOS-only because the macOS box is the Tailscale node in this setup.
+
+When in doubt, ask before expanding a platform's surface beyond what is listed above.
+
 ### Chezmoi File Naming Conventions
 
 | Prefix/suffix | Meaning |
@@ -44,6 +54,7 @@ The Claude `modify_settings.json` uses `jq` to additively merge baseline permiss
 - `home/.chezmoiignore` excludes platform-specific files (PowerShell on non-Windows; fish/git-ignore/Claude on Windows; Tailscale fish functions on non-macOS; fish `conf.d` everywhere)
 - Templates use `{{ if eq .chezmoi.os "darwin" }}` guards
 - `run_once_00_install_packages.sh.tmpl` handles macOS (Homebrew) and Linux (apt + manual installers); `.ps1.tmpl` handles Windows (winget)
+- The Linux branch intentionally installs no fonts or GUI packages — the Linux target is headless (WSL/VM), so there is no `desktop-vs-headless` split to maintain
 
 ### CI / GitHub Actions
 

@@ -4,6 +4,14 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/), supporting ma
 
 See [dev-environment](https://github.com/Psycho7/dev-environment) for rendered dotfiles on a real macOS instance.
 
+## Target Use Cases
+
+The config surface is deliberately different per platform, matching how each machine is actually used:
+
+- **macOS** — primary daily driver and dev machine with a full desktop environment. Full config: fish + functions, Nerd Font, Claude Code, Tailscale helpers.
+- **Windows** — daily use and *partial* dev work. PowerShell profile and a small CLI toolchain (ripgrep, fd, jq, starship, zoxide). Fish, Nerd Font, and Claude Code are intentionally not deployed.
+- **Linux (Debian/Ubuntu)** — WSL or a headless VM (no desktop environment assumed). CLI toolchain + fish + Claude Code. No GUI-dependent items; fonts are expected to come from the host terminal (Windows Terminal for WSL, or the host's terminal emulator for a VM).
+
 ## Quick Start
 
 ### macOS / Linux (Debian/Ubuntu)
@@ -45,7 +53,7 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 | [starship](https://starship.rs/) | Cross-shell prompt (via install script) |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | Smarter `cd` (via install script) |
 
-> Other Linux distros are not supported by the bootstrap script.
+> Linux targets WSL or a headless VM on Debian/Ubuntu. Other distros are not supported by the bootstrap script. Nerd Fonts are not installed — the host terminal (Windows Terminal, iTerm2, etc.) handles font rendering.
 
 ### Windows (winget)
 
@@ -57,7 +65,7 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 | [starship](https://starship.rs/) | `Starship.Starship` |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | `ajeetdsouza.zoxide` |
 
-> Fish shell and Nerd Fonts are not installed on Windows. PowerShell is used instead.
+> Windows is treated as a daily-use box with partial dev work. PowerShell is the shell; fish, Nerd Fonts, and Claude Code are intentionally skipped to keep the surface minimal.
 
 
 ## Configuration Options
@@ -68,7 +76,7 @@ During `chezmoi init`, you'll be prompted:
 |---|---|---|
 | Email address | `user@example.com` | Git identity |
 | Full name | `User` | Git identity |
-| Use Claude Code | `true` | Deploy Claude Code config, skills, ccstatusline (macOS/Linux only; always `false` on Windows) |
+| Use Claude Code | `true` | Deploy Claude Code config, skills, ccstatusline. Defaults to `true` on macOS and Linux (both targeted at dev work, including WSL/VM); always `false` on Windows (daily-use box) |
 
 To change after initial setup, re-run `chezmoi init`.
 
