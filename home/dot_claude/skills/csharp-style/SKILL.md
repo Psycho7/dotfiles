@@ -169,3 +169,30 @@ When writing or refactoring code, include all type definitions needed for the co
 ## Comments
 
 Use comments for non-obvious logic — algorithm choices, magic constants, domain-specific rationale. XML doc comments are appropriate on public API methods to describe purpose and contracts. Don't add comments that merely restate what the code already says through its naming and structure.
+
+**Never use decorative comment banners as section separators.** Lines like `// ── BeginMeasurementInfo ──────────` or boxed ASCII dividers clutter the file and drift out of sync with the code. Use `#region` / `#endregion` when you genuinely need to group a block:
+
+```csharp
+// Bad — decorative separator comment
+// ── BeginMeasurementInfo ────────────────────────────────────────────────
+public string SignalId { get; init; }
+public DateTime Timestamp { get; init; }
+
+// Good — #region groups the block and collapses in editors
+#region MeasurementInfo
+public string SignalId { get; init; }
+public DateTime Timestamp { get; init; }
+#endregion
+```
+
+## Naming
+
+**No underscores in method names.** Use PascalCase for all methods, including test methods. Scenario and expectation segments are separated by PascalCase word boundaries, not underscores:
+
+```csharp
+// Bad
+public void Calculate_WhenInputIsNull_ReturnsZero() { }
+
+// Good
+public void CalculateWhenInputIsNullReturnsZero() { }
+```
