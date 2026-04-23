@@ -112,7 +112,7 @@ jobs:
           # introduce via the Secrets UI.
           printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
-          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+          ssh-keyscan github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
 
       - name: Clone dev-environment
         shell: bash
