@@ -13,9 +13,23 @@ echo "Packages installed successfully!"
 echo "Installing packages on Linux (Debian/Ubuntu)..."
 if command -v apt-get &> /dev/null; then
     sudo apt update
-    sudo apt install -y fish ripgrep fd-find jq bat btop fzf gh unzip
+    sudo apt install -y fish ripgrep fd-find jq bat btop fzf wget unzip
     [ ! -f /usr/bin/fd ] && sudo ln -s /usr/bin/fdfind /usr/bin/fd
     [ ! -f /usr/bin/bat ] && sudo ln -s /usr/bin/batcat /usr/bin/bat
+fi
+# Install GitHub CLI from the official apt repository
+# (community-maintained Debian packages lag and use deprecated APIs per cli.github.com docs)
+if ! command -v gh &> /dev/null; then
+    sudo mkdir -p -m 755 /etc/apt/keyrings
+    out=$(mktemp) && wget -nv -O"$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        && sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg < "$out" > /dev/null \
+        && rm -f "$out"
+    sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    sudo mkdir -p -m 755 /etc/apt/sources.list.d
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo apt update
+    sudo apt install -y gh
 fi
 # Install starship
 curl -sS https://starship.rs/install.sh | sh -s -- -y
