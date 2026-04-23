@@ -102,9 +102,21 @@ jobs:
             > "$RUNNER_TEMP/install-packages.sh"
 
       - name: Set up SSH for dev-environment
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.DEV_ENV_DEPLOY_KEY }}
+        shell: bash
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEV_ENV_DEPLOY_KEY }}
+        run: |
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          # ssh-add rejects keys with CRLF or no trailing newline; both are easy to
+          # introduce via the Secrets UI, so normalize the bytes ourselves.
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$HOME/.ssh/dev_env_key"
+          chmod 600 "$HOME/.ssh/dev_env_key"
+          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+          eval "$(ssh-agent -s)"
+          ssh-add "$HOME/.ssh/dev_env_key"
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
 
       - name: Clone dev-environment
         shell: bash
