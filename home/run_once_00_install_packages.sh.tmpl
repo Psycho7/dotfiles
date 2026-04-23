@@ -3,7 +3,7 @@ set -e
 
 {{ if eq .chezmoi.os "darwin" -}}
 echo "Installing packages on macOS..."
-brew install fish ripgrep fd jq starship zoxide
+brew install fish ripgrep fd jq starship zoxide bat btop yazi fzf gh
 brew install --cask font-fira-code-nerd-font
 echo "Packages installed successfully!"
 {{ end -}}
@@ -13,13 +13,24 @@ echo "Packages installed successfully!"
 echo "Installing packages on Linux (Debian/Ubuntu)..."
 if command -v apt-get &> /dev/null; then
     sudo apt update
-    sudo apt install -y fish ripgrep fd-find jq
+    sudo apt install -y fish ripgrep fd-find jq bat btop fzf gh unzip
     [ ! -f /usr/bin/fd ] && sudo ln -s /usr/bin/fdfind /usr/bin/fd
+    [ ! -f /usr/bin/bat ] && sudo ln -s /usr/bin/batcat /usr/bin/bat
 fi
 # Install starship
 curl -sS https://starship.rs/install.sh | sh -s -- -y
 # Install zoxide
 curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+# Install yazi (not in Debian/Ubuntu apt repos; fetch prebuilt binary release)
+if ! command -v yazi &> /dev/null; then
+    YAZI_VERSION=$(curl -s https://api.github.com/repos/sxyazi/yazi/releases/latest | grep '"tag_name"' | cut -d '"' -f 4)
+    YAZI_TMP=$(mktemp -d)
+    curl -sSL "https://github.com/sxyazi/yazi/releases/download/${YAZI_VERSION}/yazi-x86_64-unknown-linux-gnu.zip" -o "${YAZI_TMP}/yazi.zip"
+    unzip -q -o "${YAZI_TMP}/yazi.zip" -d "${YAZI_TMP}"
+    sudo install -m 755 "${YAZI_TMP}/yazi-x86_64-unknown-linux-gnu/yazi" /usr/local/bin/yazi
+    sudo install -m 755 "${YAZI_TMP}/yazi-x86_64-unknown-linux-gnu/ya" /usr/local/bin/ya
+    rm -rf "${YAZI_TMP}"
+fi
 echo "Packages installed successfully!"
 {{ end -}}
 
