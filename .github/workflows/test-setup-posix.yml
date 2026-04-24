@@ -102,28 +102,9 @@ jobs:
             > "$RUNNER_TEMP/install-packages.sh"
 
       - name: Set up SSH for dev-environment
-        shell: bash
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.DEV_ENV_DEPLOY_KEY }}
-        run: |
-          if [ -z "${SSH_PRIVATE_KEY:-}" ]; then
-            echo "FAIL: DEV_ENV_DEPLOY_KEY secret is empty or unset"
-            exit 1
-          fi
-          mkdir -p "$HOME/.ssh"
-          chmod 700 "$HOME/.ssh"
-          # Normalize: ssh rejects CRLF or missing trailing newline, both easy to
-          # introduce via the Secrets UI.
-          key_file="$HOME/.ssh/dev_environment"
-          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$key_file"
-          chmod 600 "$key_file"
-          ssh-keygen -y -f "$key_file" > /dev/null
-          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> "$HOME/.ssh/known_hosts"
-          if ! grep -q '^github.com ' "$HOME/.ssh/known_hosts"; then
-            echo "FAIL: ssh-keyscan produced no github.com host keys"
-            exit 1
-          fi
-          echo "GIT_SSH_COMMAND=ssh -i $key_file -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" >> "$GITHUB_ENV"
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEV_ENV_DEPLOY_KEY }}
 
       - name: Clone dev-environment
         shell: bash
