@@ -3,7 +3,7 @@ set -e
 
 {{ if eq .chezmoi.os "darwin" -}}
 echo "Installing packages on macOS..."
-brew install fish ripgrep fd jq starship zoxide bat btop yazi fzf gh
+brew install fish ripgrep fd jq starship zoxide bat btop yazi fzf gh git-delta gnupg
 brew install --cask font-fira-code-nerd-font
 echo "Packages installed successfully!"
 {{ end -}}
@@ -13,7 +13,7 @@ echo "Packages installed successfully!"
 echo "Installing packages on Linux (Debian/Ubuntu)..."
 if command -v apt-get &> /dev/null; then
     sudo apt update
-    sudo apt install -y fish ripgrep fd-find jq bat btop fzf wget unzip
+    sudo apt install -y fish ripgrep fd-find jq bat btop fzf wget unzip git-delta gnupg
     [ ! -f /usr/bin/fd ] && sudo ln -s /usr/bin/fdfind /usr/bin/fd
     [ ! -f /usr/bin/bat ] && sudo ln -s /usr/bin/batcat /usr/bin/bat
 
