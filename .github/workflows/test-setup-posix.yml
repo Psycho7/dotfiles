@@ -106,13 +106,24 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DEV_ENV_DEPLOY_KEY }}
         run: |
+          if [ -z "${SSH_PRIVATE_KEY:-}" ]; then
+            echo "FAIL: DEV_ENV_DEPLOY_KEY secret is empty or unset"
+            exit 1
+          fi
           mkdir -p "$HOME/.ssh"
           chmod 700 "$HOME/.ssh"
           # Normalize: ssh rejects CRLF or missing trailing newline, both easy to
           # introduce via the Secrets UI.
-          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
-          chmod 600 "$HOME/.ssh/id_ed25519"
-          ssh-keyscan github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+          key_file="$HOME/.ssh/dev_environment"
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$key_file"
+          chmod 600 "$key_file"
+          ssh-keygen -y -f "$key_file" > /dev/null
+          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> "$HOME/.ssh/known_hosts"
+          if ! grep -q '^github.com ' "$HOME/.ssh/known_hosts"; then
+            echo "FAIL: ssh-keyscan produced no github.com host keys"
+            exit 1
+          fi
+          echo "GIT_SSH_COMMAND=ssh -i $key_file -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" >> "$GITHUB_ENV"
 
       - name: Clone dev-environment
         shell: bash
