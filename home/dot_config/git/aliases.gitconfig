@@ -11,6 +11,7 @@
         --date=relative \
         --abbrev-commit \
         --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(cyan)[%aN]%C(brightmagenta)<%ae> %C(green)(%ad)%Creset'
+    ignored = status --ignored --short
 
     # fetch
     f = fetch --all --verbose
