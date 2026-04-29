@@ -1,0 +1,5 @@
+{
+  "enabledPlugins": {
+    "chezmoi-cookbook@chezmoi-cookbook": true
+  }
+}

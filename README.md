@@ -94,7 +94,7 @@ When `useClaude` is enabled, `modify_settings.json` merges the following into `~
 | `permissions.ask` | *(list)* | Prompts before running: `git push`, `git reset`, `git clean`, `rm` |
 | `permissions.deny` | *(list)* | Blocked commands: `sudo` |
 
-A global `~/.claude/CLAUDE.md` with coding principles and three custom skills (`csharp-style`, `proxy-explore`, `zai-delegate`) are also deployed.
+A global `~/.claude/CLAUDE.md` with coding principles, the `csharp-style` custom skill, and the vendored [humanizer](https://github.com/blader/humanizer) skill are also deployed.
 
 ## Keeping Up to Date
 

@@ -11,7 +11,7 @@ User-wide guideline for all repositories. Project-level CLAUDE.md and user promp
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
 Before implementing:
-- State your assumptions explicitly. 
+- State your assumptions explicitly.
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
 - If uncertain, you MUST use tool AskUserQuestion for clarification.
@@ -26,8 +26,6 @@ Before implementing:
 - No "flexibility" or "configurability" that wasn't requested.
 - No error handling for impossible scenarios.
 - Do not add/upgrade NuGet/vcpkg/npm/Cargo/etc. packages or new feeds without approval
-
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
 ### 3. Surgical Changes
 
@@ -46,18 +44,16 @@ Every changed line should trace directly to the user's request.
 **Define success criteria. Loop until verified.**
 
 Transform tasks into verifiable goals:
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
+- "Add validation" -> "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" -> "Write a test that reproduces it, then make it pass"
+- "Refactor X" -> "Ensure tests pass before and after"
 
 For multi-step tasks, state a brief plan:
 ```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
+1. [Step] -> verify: [check]
+2. [Step] -> verify: [check]
+3. [Step] -> verify: [check]
 ```
-
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
 ### 5. Write First, Simplify Later
 
@@ -73,6 +69,11 @@ Run simplification only at natural completion boundaries:
 - All relevant tests pass.
 
 Skip simplification entirely for throwaway, exploratory, or prototype code.
+
+## Code Comments
+Applies to all in-source text that is not code: line/block comments, docstrings, TODO/FIXME/NOTE markers, license/file headers.
+- Use ASCII characters only unless explicitly asked otherwise (no em-dashes, smart quotes, Unicode arrows, non-ASCII symbols).
+- Do not mention or refer to external documentation, design docs, ADRs, tickets, wikis, or other Markdown files.
 
 ## Documentation
 - The user is an experienced developer; skip obvious basics in explanations and docs.
@@ -91,6 +92,8 @@ Skip simplification entirely for throwaway, exploratory, or prototype code.
 ## Git
 - Do not commit unless explicitly asked.
 - Avoid committing untracked/generated/binary artifacts. Keep commits scoped and descriptive.
+- Use ASCII characters only in commit messages unless explicitly asked otherwise.
+- Do not mention or refer to external documentation, design docs, ADRs, tickets, wikis, or other Markdown files in commit messages.
 - Commit message style: imperative mood. Single line for small changes (e.g., `Fix null check in parser`). For large commits, a brief summary line followed by bullet details:
 
 ```
@@ -101,9 +104,8 @@ Refactor auth middleware
 - Remove deprecated session helpers
 ```
 
-## Exploration 
-- Use the proxy-explore skill for all codebase exploration, including plan mode Phase 1 — it delegates to a faster model and preserves main context. The Explore subagent type is only a fallback when proxy-explore is unavailable.
-- Trust proxy-explore for exploration summary and structure, do not re-explore.
+## Exploration
+- Trust subagent exploration summaries; do not re-explore.
 - For complex exploration, split the task into smaller pieces and spawn up to 3 subagents in parallel.
 - Only re-read files you will edit or where the summary is ambiguous.
 

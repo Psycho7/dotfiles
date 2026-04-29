@@ -19,6 +19,9 @@ Documents/PowerShell
 .config/fish/functions/glm.fish
 {{- end }}
 
+# Vendored humanizer skill — exclude its inner git repo
+.claude/skills/humanizer/.git
+
 # fish conf.d — machine-specific, managed outside chezmoi
 .config/fish/conf.d
 
