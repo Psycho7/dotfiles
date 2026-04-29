@@ -1,4 +1,12 @@
 {
+  "extraKnownMarketplaces": {
+    "chezmoi-cookbook": {
+      "source": {
+        "source": "github",
+        "repo": "Psycho7/chezmoi-cookbook"
+      }
+    }
+  },
   "enabledPlugins": {
     "chezmoi-cookbook@chezmoi-cookbook": true
   }
