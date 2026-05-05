@@ -3,7 +3,13 @@ name: Test dotfiles (POSIX)
 on:
   push:
     branches: [main]
+    paths:
+      - 'home/**'
+      - '.github/workflows/test-setup-posix.yml'
   pull_request:
+    paths:
+      - 'home/**'
+      - '.github/workflows/test-setup-posix.yml'
 
 jobs:
   test-setup:

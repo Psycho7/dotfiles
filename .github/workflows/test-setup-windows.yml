@@ -3,7 +3,13 @@ name: Test dotfiles (Windows)
 on:
   push:
     branches: [main]
+    paths:
+      - 'home/**'
+      - '.github/workflows/test-setup-windows.yml'
   pull_request:
+    paths:
+      - 'home/**'
+      - '.github/workflows/test-setup-windows.yml'
 
 jobs:
   test-setup:
