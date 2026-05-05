@@ -22,6 +22,10 @@ Documents/PowerShell
 # Vendored humanizer skill — exclude its inner git repo
 .claude/skills/humanizer/.git
 
+# Claude Code plugins/ - runtime/cache state managed by Claude Code itself.
+# Plugin install state is driven by enabledPlugins in dot_claude/modify_settings.json.
+.claude/plugins
+
 # fish conf.d — machine-specific, managed outside chezmoi
 .config/fish/conf.d
 

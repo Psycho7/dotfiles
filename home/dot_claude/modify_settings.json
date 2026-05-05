@@ -1,6 +1,10 @@
 #!/bin/bash
 # Merges managed fields into existing settings.json, preserving everything else.
-# Managed fields: env.DISABLE_AUTOUPDATER, attribution, permissions.allow/ask/deny (additive), statusLine, showClearContextOnPlanAccept
+# Managed fields:
+#   - env.DISABLE_AUTOUPDATER, attribution, statusLine, showClearContextOnPlanAccept (replace)
+#   - permissions.allow/ask/deny (additive)
+#   - enabledPlugins, extraKnownMarketplaces (additive defaults: tracked entries
+#     seed missing keys; local entries always win and are never removed)
 
 existing=$(cat)
 
@@ -20,6 +24,41 @@ ask_permissions='[
 deny_permissions='[
   "Bash(sudo:*)"
 ]'
+
+# Plugins to ensure are known to Claude Code's plugin sync. Values are defaults
+# applied only when the local settings.json has no entry for the key. Local
+# enable/disable toggles via /plugin take precedence on subsequent applies.
+# Local-only entries not listed here are preserved.
+enabled_plugins_defaults='{
+  "typescript-lsp@claude-plugins-official": false,
+  "pyright-lsp@claude-plugins-official": false,
+  "csharp-lsp@claude-plugins-official": false,
+  "rust-analyzer-lsp@claude-plugins-official": false,
+  "clangd-lsp@claude-plugins-official": false,
+  "skill-creator@claude-plugins-official": false,
+  "plugin-dev@claude-plugins-official": false,
+  "feature-dev@claude-plugins-official": false,
+  "codex@openai-codex": false,
+  "claude-md-management@claude-plugins-official": true,
+  "code-simplifier@claude-plugins-official": true,
+  "superpowers@claude-plugins-official": true,
+  "obsidian@obsidian-skills": true,
+  "claude-code-setup@claude-plugins-official": true
+}'
+
+# Non-default marketplaces. claude-plugins-official is bundled and need not be listed.
+# Applied only as defaults; local-only marketplace entries are preserved.
+extra_marketplaces='{
+  "obsidian-skills": {
+    "source": {"source": "github", "repo": "kepano/obsidian-skills"}
+  },
+  "chezmoi-cookbook": {
+    "source": {"source": "github", "repo": "Psycho7/chezmoi-cookbook"}
+  },
+  "openai-codex": {
+    "source": {"source": "github", "repo": "openai/codex-plugin-cc"}
+  }
+}'
 
 # Baseline permissions we always want present
 baseline_permissions='[
@@ -59,12 +98,19 @@ baseline_permissions='[
   "Bash(dotnet new:*)"
 ]'
 
-echo "$existing" | jq --argjson baseline "$baseline_permissions" --argjson ask "$ask_permissions" --argjson deny "$deny_permissions" '
+echo "$existing" | jq \
+    --argjson baseline "$baseline_permissions" \
+    --argjson ask "$ask_permissions" \
+    --argjson deny "$deny_permissions" \
+    --argjson enabledPluginsDefaults "$enabled_plugins_defaults" \
+    --argjson extraMarketplaces "$extra_marketplaces" '
   .env.DISABLE_AUTOUPDATER = "1" |
   .attribution = {"commit": "", "pr": ""} |
   .statusLine = {"type": "command", "command": "bunx -y ccstatusline@latest", "padding": 0} |
   .showClearContextOnPlanAccept = true |
   .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
   .permissions.ask = ((.permissions.ask // []) + $ask | unique) |
-  .permissions.deny = ((.permissions.deny // []) + $deny | unique)
+  .permissions.deny = ((.permissions.deny // []) + $deny | unique) |
+  .enabledPlugins = ($enabledPluginsDefaults * (.enabledPlugins // {})) |
+  .extraKnownMarketplaces = ($extraMarketplaces * (.extraKnownMarketplaces // {}))
 '
