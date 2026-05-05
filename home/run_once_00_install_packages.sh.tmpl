@@ -3,7 +3,8 @@ set -e
 
 {{ if eq .chezmoi.os "darwin" -}}
 echo "Installing packages on macOS..."
-brew install fish ripgrep fd jq starship zoxide bat btop yazi fzf gh git-delta gnupg node bun
+brew install fish ripgrep fd jq starship zoxide bat btop yazi fzf gh git-delta gnupg node
+brew install oven-sh/bun/bun
 brew install --cask font-fira-code-nerd-font
 echo "Packages installed successfully!"
 {{ end -}}
