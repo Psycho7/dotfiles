@@ -41,6 +41,7 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 | [starship](https://starship.rs/) | Cross-shell prompt |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | Smarter `cd` |
 | [node](https://nodejs.org/) | JavaScript runtime + npm |
+| [bun](https://bun.sh/) | JavaScript runtime + package manager |
 | [Fira Code Nerd Font](https://www.nerdfonts.com/) | Terminal font (cask) |
 
 ### Linux (Debian/Ubuntu)
@@ -54,6 +55,7 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 | [starship](https://starship.rs/) | Cross-shell prompt (via install script) |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | Smarter `cd` (via install script) |
 | [node](https://nodejs.org/) | JavaScript runtime + npm (via NodeSource LTS) |
+| [bun](https://bun.sh/) | JavaScript runtime + package manager (via install script) |
 
 > Linux targets WSL or a headless VM on Debian/Ubuntu. Other distros are not supported by the bootstrap script. Nerd Fonts are not installed — the host terminal (Windows Terminal, iTerm2, etc.) handles font rendering.
 
