@@ -3,7 +3,7 @@ set -e
 
 {{ if eq .chezmoi.os "darwin" -}}
 echo "Installing packages on macOS..."
-brew install fish ripgrep fd jq starship zoxide bat btop yazi fzf gh git-delta gnupg
+brew install fish ripgrep fd jq starship zoxide bat btop yazi fzf gh git-delta gnupg node
 brew install --cask font-fira-code-nerd-font
 echo "Packages installed successfully!"
 {{ end -}}
@@ -16,6 +16,12 @@ if command -v apt-get &> /dev/null; then
     sudo apt install -y fish ripgrep fd-find jq bat btop fzf wget unzip git-delta gnupg
     [ ! -f /usr/bin/fd ] && sudo ln -s /usr/bin/fdfind /usr/bin/fd
     [ ! -f /usr/bin/bat ] && sudo ln -s /usr/bin/batcat /usr/bin/bat
+
+    # Install Node.js LTS from NodeSource (apt's nodejs is too old for npm tools like codex)
+    if ! command -v node &> /dev/null; then
+        curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+        sudo apt install -y nodejs
+    fi
 
     # Install GitHub CLI from the official apt repository
     # (community-maintained Debian packages lag and use deprecated APIs per cli.github.com docs)
@@ -58,4 +64,12 @@ echo "Packages installed successfully!"
 # Install Claude Code
 curl -fsSL https://claude.ai/install.sh | bash
 echo "Claude Code installed successfully!"
+
+# Install codex and opencode CLIs via npm
+{{ if eq .chezmoi.os "darwin" -}}
+npm install -g @openai/codex opencode-ai
+{{ else if eq .chezmoi.os "linux" -}}
+sudo npm install -g @openai/codex opencode-ai
+{{ end -}}
+echo "codex and opencode installed successfully!"
 {{ end -}}

@@ -40,6 +40,7 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 | [jq](https://jqlang.github.io/jq/) | JSON processor |
 | [starship](https://starship.rs/) | Cross-shell prompt |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | Smarter `cd` |
+| [node](https://nodejs.org/) | JavaScript runtime + npm |
 | [Fira Code Nerd Font](https://www.nerdfonts.com/) | Terminal font (cask) |
 
 ### Linux (Debian/Ubuntu)
@@ -52,6 +53,7 @@ chezmoi init --apply https://github.com/Psycho7/dotfiles.git
 | [jq](https://jqlang.github.io/jq/) | JSON processor (via apt) |
 | [starship](https://starship.rs/) | Cross-shell prompt (via install script) |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | Smarter `cd` (via install script) |
+| [node](https://nodejs.org/) | JavaScript runtime + npm (via NodeSource LTS) |
 
 > Linux targets WSL or a headless VM on Debian/Ubuntu. Other distros are not supported by the bootstrap script. Nerd Fonts are not installed — the host terminal (Windows Terminal, iTerm2, etc.) handles font rendering.
 
@@ -95,6 +97,8 @@ When `useClaude` is enabled, `modify_settings.json` merges the following into `~
 | `permissions.deny` | *(list)* | Blocked commands: `sudo` |
 
 A global `~/.claude/CLAUDE.md` with coding principles, the `csharp-style` custom skill, and the vendored [humanizer](https://github.com/blader/humanizer) skill are also deployed.
+
+When `useClaude` is enabled, [`@openai/codex`](https://github.com/openai/codex) and [`opencode-ai`](https://github.com/sst/opencode) are also installed globally via `npm`.
 
 ## Keeping Up to Date
 
