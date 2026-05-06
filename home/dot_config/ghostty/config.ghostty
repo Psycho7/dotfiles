@@ -1,0 +1,7 @@
+theme = Catppuccin Frappe
+font-size = 15
+background-opacity = 0.9
+background-blur-radius = 20
+window-padding-x = 10
+window-padding-y = 10
+shell-integration-features = ssh-env,ssh-terminfo
