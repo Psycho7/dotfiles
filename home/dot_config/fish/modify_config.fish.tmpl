@@ -18,6 +18,8 @@ managed+=('    /opt/homebrew/bin/brew shellenv | source')
 managed+=('end')
 managed+=('')
 {{- end }}
+managed+=('set -q COLORTERM; or set -gx COLORTERM truecolor')
+managed+=('')
 managed+=('fish_add_path $HOME/.local/bin')
 managed+=('')
 managed+=('starship init fish | source')
