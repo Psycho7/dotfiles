@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Bootstrap Claude Code marketplaces and plugins from .chezmoidata/claude_plugins.yaml.
+#
+# Behavior:
+#   - Marketplaces in claude.marketplaces are added if not already registered.
+#   - Plugins in claude.plugins.enabled are installed at user scope if missing.
+#   - Plugins in claude.plugins.disabled are installed at user scope if missing,
+#     then immediately disabled. If the disable step fails, the install is
+#     rolled back via uninstall so the next run retries cleanly (avoids the
+#     non-atomic install+disable leaving a plugin enabled silently).
+#   - Already-installed user-scope plugins are NOT touched, so user toggles
+#     via /plugin or `claude plugin enable|disable` survive subsequent runs.
+#   - Project- and local-scope installs are ignored when checking presence,
+#     so a project-scope plugin with the same id never masks the user-scope
+#     install on a fresh machine.
+#
+# Excluded from non-Claude machines via .chezmoiignore (not a runtime guard).
+
+set -uo pipefail
+
+if ! command -v claude >/dev/null 2>&1; then
+    echo "claude CLI not found; skipping plugin bootstrap" >&2
+    exit 0
+fi
+if ! command -v jq >/dev/null 2>&1; then
+    echo "jq not found; aborting plugin bootstrap" >&2
+    exit 1
+fi
+
+if ! marketplaces_json=$(claude plugin marketplace list --json); then
+    echo "ERROR: claude plugin marketplace list --json failed; aborting" >&2
+    exit 1
+fi
+if ! plugins_json=$(claude plugin list --json); then
+    echo "ERROR: claude plugin list --json failed; aborting" >&2
+    exit 1
+fi
+
+existing_marketplaces=$(jq -r '.[].name' <<<"$marketplaces_json")
+existing_user_plugins=$(jq -r '.[] | select(.scope == "user") | .id' <<<"$plugins_json")
+
+mkt_known() { grep -qxF "$1" <<<"$existing_marketplaces"; }
+user_plg_installed() { grep -qxF "$1" <<<"$existing_user_plugins"; }
+
+failures=0
+
+{{ range .claude.marketplaces -}}
+if mkt_known "{{ .name }}"; then
+    echo "marketplace already added: {{ .name }}"
+else
+    echo "adding marketplace: {{ .name }} ({{ .repo }})"
+    claude plugin marketplace add "{{ .repo }}" || { echo "FAILED: marketplace add {{ .repo }}" >&2; failures=$((failures+1)); }
+fi
+{{ end }}
+
+{{ range .claude.plugins.enabled -}}
+if user_plg_installed "{{ . }}"; then
+    echo "plugin already installed at user scope: {{ . }}"
+else
+    echo "installing (enabled): {{ . }}"
+    claude plugin install "{{ . }}" --scope user || { echo "FAILED: plugin install {{ . }}" >&2; failures=$((failures+1)); }
+fi
+{{ end }}
+
+{{ range .claude.plugins.disabled -}}
+if user_plg_installed "{{ . }}"; then
+    echo "plugin already installed at user scope: {{ . }} (enable state preserved)"
+else
+    echo "installing (initial state: disabled): {{ . }}"
+    if claude plugin install "{{ . }}" --scope user; then
+        if ! claude plugin disable "{{ . }}" --scope user; then
+            echo "FAILED: plugin disable {{ . }}; rolling back install for retry on next run" >&2
+            claude plugin uninstall "{{ . }}" --scope user >/dev/null 2>&1 || true
+            failures=$((failures+1))
+        fi
+    else
+        echo "FAILED: plugin install {{ . }}" >&2
+        failures=$((failures+1))
+    fi
+fi
+{{ end }}
+
+if [ "$failures" -gt 0 ]; then
+    echo "Claude plugin bootstrap finished with $failures failure(s)" >&2
+    exit 1
+fi
+echo "Claude plugin bootstrap done"
