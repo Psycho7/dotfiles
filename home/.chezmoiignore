@@ -9,6 +9,7 @@ Documents/PowerShell
 {{- if eq .chezmoi.os "windows" }}
 .config/fish
 .config/git/ignore
+.tmux.conf
 00_install_packages.sh
 {{- end }}
 
