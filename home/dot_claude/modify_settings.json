@@ -73,6 +73,7 @@ echo "$existing" | jq \
   .attribution = {"commit": "", "pr": ""} |
   .statusLine = {"type": "command", "command": "bunx -y ccstatusline@latest", "padding": 0} |
   .showClearContextOnPlanAccept = true |
+  .skillListingBudgetFraction = 0.03 |
   .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
   .permissions.ask = ((.permissions.ask // []) + $ask | unique) |
   .permissions.deny = ((.permissions.deny // []) + $deny | unique)
