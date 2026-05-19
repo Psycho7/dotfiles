@@ -54,12 +54,16 @@ fi
 {{ end }}
 
 # Refresh every registered marketplace so plugin installs see the latest
-# manifest. The bundled `claude-plugins-official` marketplace in particular
-# can ship with a stale manifest, causing installs to fail with
-# "Plugin <id> not found in marketplace 'claude-plugins-official'".
+# manifest. The bundled `claude-plugins-official` marketplace ships with a
+# stale manifest AND does not appear in `marketplace list --json` on a fresh
+# Claude install, so we refresh it explicitly here before iterating.
+echo "updating marketplace: claude-plugins-official"
+claude plugin marketplace update claude-plugins-official || echo "WARN: marketplace update claude-plugins-official failed; install may use stale manifest" >&2
+
 if refreshed_marketplaces=$(claude plugin marketplace list --json); then
     while IFS= read -r mkt; do
         [ -n "$mkt" ] || continue
+        [ "$mkt" = "claude-plugins-official" ] && continue
         echo "updating marketplace: $mkt"
         claude plugin marketplace update "$mkt" || echo "WARN: marketplace update $mkt failed; install may use stale manifest" >&2
     done < <(jq -r '.[].name' <<<"$refreshed_marketplaces")
