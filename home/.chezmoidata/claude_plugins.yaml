@@ -1,13 +1,14 @@
 # Claude Code plugin manifest. Consumed by run_once_after_install_claude_plugins.sh.tmpl.
 #
-# - marketplaces: non-default marketplaces to register. claude-plugins-official
-#   is bundled and must not be listed here. Each entry adds via:
+# - marketplaces: marketplaces to register. Each entry adds via:
 #     claude plugin marketplace add <repo>
 #   The `name` field is used solely for the idempotency check against
 #   `claude plugin marketplace list --json`. The CLI derives the registered
 #   marketplace name from the upstream marketplace manifest, not from `name`
 #   here, so each entry's `name` MUST match what the upstream marketplace
 #   declares. The `repo` field is what gets passed to the CLI.
+#   claude-plugins-official is NOT auto-registered on fresh Claude installs
+#   even though plugins reference it by that name, so we list it explicitly.
 # - plugins.enabled: installed at user scope and left active.
 # - plugins.disabled: installed at user scope, then disabled, so they are
 #   cached locally but inert until manually enabled via /plugin or
@@ -16,9 +17,10 @@
 
 claude:
   marketplaces:
-    - {name: obsidian-skills,  repo: kepano/obsidian-skills}
-    - {name: chezmoi-cookbook, repo: Psycho7/chezmoi-cookbook}
-    - {name: openai-codex,     repo: openai/codex-plugin-cc}
+    - {name: claude-plugins-official, repo: anthropics/claude-plugins-official}
+    - {name: obsidian-skills,         repo: kepano/obsidian-skills}
+    - {name: chezmoi-cookbook,        repo: Psycho7/chezmoi-cookbook}
+    - {name: openai-codex,            repo: openai/codex-plugin-cc}
   plugins:
     enabled:
       - claude-md-management@claude-plugins-official
