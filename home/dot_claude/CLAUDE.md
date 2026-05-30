@@ -70,6 +70,13 @@ Run simplification only at natural completion boundaries:
 
 Skip simplification entirely for throwaway, exploratory, or prototype code.
 
+## Interaction and Tooling Discipline
+
+- When calling AskUserQuestion, ask and STOP. No edits, actions, or agent dispatches in the same turn; act only after the answer arrives. Never pre-commit to a guessed option.
+- Find all affected sites before asking a scoping question. Ask once with the real scope.
+- Verify paths, files, and scope with a real read/grep before launching a workflow or fan-out. Never size work off unverified bash output, invented filenames, or stale summaries.
+- Skip a workflow when doing it inline is faster.
+
 ## Code Comments
 Applies to all in-source text that is not code: line/block comments, docstrings, TODO/FIXME/NOTE markers, license/file headers.
 - Use ASCII characters only unless explicitly asked otherwise (no em-dashes, smart quotes, Unicode arrows, non-ASCII symbols).
