@@ -118,7 +118,8 @@ Refactor auth middleware
 
 ## Tools
 - Use `jq` for JSON processing
-- Prefer built-in tools over Bash:
-  - Glob/Read (not `fd`, `find`, `cat`, `head`)
-  - Grep (not `rg`, `grep`)
+- File finding: use `fd` (not `find`)
+- Content search: use `rg` (not `grep`)
+- Prefer built-in tools over Bash where available:
+  - Read (not `cat`, `head`)
   - Edit/Write (not `sed`, `awk`, `>`)
