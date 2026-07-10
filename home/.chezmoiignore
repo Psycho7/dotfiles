@@ -10,6 +10,8 @@ Documents/PowerShell
 .config/fish
 .config/git/ignore
 .tmux.conf
+.vimrc
+.vim
 00_install_packages.sh
 {{- end }}
 

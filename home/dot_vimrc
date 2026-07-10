@@ -1,0 +1,160 @@
+" ~/.vimrc - owned minimal config, managed by chezmoi.
+" Plugins are vim native packages in ~/.vim/pack/mine/start, fetched by
+" chezmoi as archives. Everything below must load cleanly on a bare box
+" where those packages are absent and on vims older than 8.0.
+
+" --------------------------------------------------------------------
+" Leader
+" --------------------------------------------------------------------
+" Comma as leader; set before any mapping that uses it
+let mapleader = ","
+
+" --------------------------------------------------------------------
+" Files and buffers
+" --------------------------------------------------------------------
+set encoding=utf-8              " default to utf-8
+set fileformats=unix,dos,mac    " line-ending detection order
+set hidden                      " switch away from unsaved buffers
+set autoread                    " pick up outside changes to files
+set nobackup                    " no backup files ...
+set nowritebackup               " ... not even while writing
+set noswapfile                  " no swap files, no recovery prompts
+
+" Re-check for outside changes when vim regains focus or enters a buffer
+augroup vimrc_autoread
+  autocmd!
+  autocmd FocusGained,BufEnter * silent! checktime
+augroup END
+
+" Persistent undo across sessions, kept in one central directory
+if has('persistent_undo')
+  if !isdirectory(expand('~/.vim/undodir'))
+    call mkdir(expand('~/.vim/undodir'), 'p', 0700)
+  endif
+  set undodir=~/.vim/undodir    " central undo location
+  set undofile                  " save undo history per file
+endif
+
+" --------------------------------------------------------------------
+" UI
+" --------------------------------------------------------------------
+set number                      " absolute line numbers
+set ruler                       " line/column in the fallback statusline
+set scrolloff=7                 " keep context lines around the cursor
+set wildmenu                    " visual command-line completion
+set laststatus=2                " always show the statusline
+set noshowmode                  " statusline shows the mode; no duplicate
+set showcmd                     " show pending keys of a command
+
+" --------------------------------------------------------------------
+" Search
+" --------------------------------------------------------------------
+set ignorecase                  " case-insensitive search ...
+set smartcase                   " ... unless the pattern has capitals
+set incsearch                   " jump to matches while typing
+set hlsearch                    " highlight all matches
+
+" --------------------------------------------------------------------
+" Indentation
+" --------------------------------------------------------------------
+set expandtab                   " spaces, never tab characters
+set smarttab                    " shiftwidth at line start, tabstop elsewhere
+set shiftwidth=4                " indent step
+set tabstop=4                   " tab display width
+set autoindent                  " carry indent over to new lines
+" No smartindent: filetype indent scripts handle language-aware indent
+filetype plugin indent on       " filetype detection, ftplugins, indent
+
+" --------------------------------------------------------------------
+" Prose and wrapping
+" --------------------------------------------------------------------
+set wrap                        " soft-wrap long lines
+set linebreak                   " wrap at word boundaries, not mid-word
+if exists('+breakindent')
+  set breakindent               " align wrapped text under the line indent
+endif
+
+" --------------------------------------------------------------------
+" Input
+" --------------------------------------------------------------------
+set mouse=a                     " mouse for clicks, selection, scrolling
+set backspace=indent,eol,start  " backspace over everything in insert mode
+if has('clipboard')
+  set clipboard=unnamed         " yank/put through the system clipboard
+endif
+
+" --------------------------------------------------------------------
+" Colors
+" --------------------------------------------------------------------
+syntax enable                   " syntax highlighting
+if has('termguicolors')
+  set termguicolors             " 24-bit color in capable terminals
+endif
+silent! colorscheme dracula     " package colorscheme; ignore if absent
+if !exists('g:colors_name')
+  " Fallback for boxes without the dracula package
+  try
+    colorscheme habamax         " built-in since vim 9
+  catch
+    colorscheme desert          " built-in everywhere
+  endtry
+endif
+
+" --------------------------------------------------------------------
+" Statusline (lightline)
+" --------------------------------------------------------------------
+" Inert when lightline is absent; the default statusline still works
+let g:lightline = {
+      \ 'colorscheme': 'dracula',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ], [ 'filename', 'modified' ] ],
+      \   'right': [ [ 'percent', 'lineinfo' ],
+      \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
+      \ },
+      \ }
+
+" --------------------------------------------------------------------
+" Markdown and lists
+" --------------------------------------------------------------------
+" Highlight fenced code blocks via the built-in markdown syntax
+let g:markdown_fenced_languages =
+      \ ['python', 'bash=sh', 'javascript', 'json', 'yaml', 'vim']
+
+" bullets.vim: Enter continues a list aligned with its sibling, Enter on
+" an empty item ends the list, Ctrl-t / Ctrl-d indent/dedent in insert
+let g:bullets_enabled_file_types = ['markdown', 'text', 'gitcommit']
+
+" 2-space indent for prose-adjacent formats
+augroup vimrc_filetypes
+  autocmd!
+  autocmd FileType markdown,yaml setlocal shiftwidth=2 tabstop=2 softtabstop=2
+augroup END
+
+" --------------------------------------------------------------------
+" Remote clipboard (OSC52)
+" --------------------------------------------------------------------
+" Explicit yank to the terminal clipboard for SSH boxes and containers
+" where clipboard=unnamed cannot reach the local machine. Inert when the
+" oscyank package is absent; unused locally where unnamed suffices.
+nmap <leader>y <Plug>OSCYankOperator
+nmap <leader>yy <leader>y_
+xmap <leader>y <Plug>OSCYankVisual
+
+" --------------------------------------------------------------------
+" Commands
+" --------------------------------------------------------------------
+" :W writes a root-owned file via sudo (useful over SSH)
+command! W execute 'w !sudo tee % > /dev/null' <bar> edit!
+
+" --------------------------------------------------------------------
+" Autocmds
+" --------------------------------------------------------------------
+augroup vimrc_restore_cursor
+  autocmd!
+  " Reopen files at the last cursor position; skipping commit buffers
+  " leaves git commits starting at line 1
+  autocmd BufReadPost *
+        \ if line("'\"") >= 1 && line("'\"") <= line('$') && &filetype !~# 'commit'
+        \ |   execute 'normal! g`"'
+        \ | endif
+augroup END
