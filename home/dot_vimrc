@@ -113,6 +113,29 @@ let g:lightline = {
       \ },
       \ }
 
+" The dracula theme paints the far-right block purple in every mode,
+" which clashes with the green/orange mode block outside normal mode.
+" Recolor it to match its slate neighbor so only the mode block changes
+" color. Non-normal modes inherit their right side from the normal
+" palette, so one entry fixes all modes. Runs at VimEnter because the
+" palette is an autoload variable that exists only once plugins load;
+" the catch keeps a plugin-less box error-free.
+function! s:NeutralLightlineRight() abort
+  try
+    let l:palette = g:lightline#colorscheme#dracula#palette
+  catch
+    return
+  endtry
+  let l:palette.normal.right[0] = copy(l:palette.normal.right[1])
+  call lightline#init()
+  call lightline#colorscheme()
+  call lightline#update()
+endfunction
+augroup vimrc_lightline_palette
+  autocmd!
+  autocmd VimEnter * call s:NeutralLightlineRight()
+augroup END
+
 " --------------------------------------------------------------------
 " Markdown and lists
 " --------------------------------------------------------------------
