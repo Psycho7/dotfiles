@@ -139,16 +139,15 @@ let g:lightline = {
       \ 'subseparator': { 'left': "\u00b7", 'right': "\u00b7" },
       \ }
 
-" OS logo matching the fileformat value; plain text for odd values
+" Line endings named as editors show them: LF, CRLF, or CR
 function! LightlineFileformat() abort
-  let l:icons = { 'unix': "\ue712", 'dos': "\ue70f", 'mac': "\ue711" }
-  return has_key(l:icons, &fileformat)
-        \ ? l:icons[&fileformat] . ' ' . &fileformat : &fileformat
+  let l:names = { 'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR' }
+  return get(l:names, &fileformat, &fileformat)
 endfunction
 
-" Language icon before the encoding (falls back to global encoding)
+" Font icon before the encoding (falls back to global encoding)
 function! LightlineFileencoding() abort
-  return "\uf1ab " . (&fileencoding !=# '' ? &fileencoding : &encoding)
+  return "\uf031 " . (&fileencoding !=# '' ? &fileencoding : &encoding)
 endfunction
 
 " File icon before the filetype
