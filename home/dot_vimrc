@@ -118,32 +118,41 @@ endif
 " Statusline (lightline)
 " --------------------------------------------------------------------
 " Inert when lightline is absent; the default statusline still works
+" Blocks are separated by background color changes, not | characters;
+" modified sits in its own block that only appears when the buffer is
+" dirty (lightline collapses groups whose components are all empty)
 let g:lightline = {
       \ 'colorscheme': 'dracula',
       \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ], [ 'filename', 'modified' ] ],
+      \   'left': [ [ 'mode', 'paste' ], [ 'filename' ], [ 'modified' ] ],
       \   'right': [ [ 'percent', 'lineinfo' ],
       \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
       \ },
+      \ 'subseparator': { 'left': '', 'right': '' },
       \ }
 
 " Palette tweaks, applied at VimEnter (the palette autoload variable
 " needs the plugin present; the catch keeps a plugin-less box quiet):
-" - far-right block: dracula paints it purple in every mode, clashing
-"   with the mode block outside normal mode; recolor it to match its
-"   slate neighbor. Non-normal modes inherit their right side from the
-"   normal palette, so one entry fixes all modes.
 " - command mode: the theme has no entry for it, so it falls back to
 "   normal purple; give it cyan to make : mode visible at a glance
+" - modified: third left block, black on yellow, added for every mode
+" - right side: position block in slate, file metadata block in gray,
+"   constant across modes so only the mode block signals the mode
 function! s:TweakLightlinePalette() abort
   try
     let l:palette = g:lightline#colorscheme#dracula#palette
   catch
     return
   endtry
-  let l:palette.normal.right[0] = copy(l:palette.normal.right[1])
   let l:palette.command = { 'left': [ ['#282A36', '#8BE9FD', 236, 117],
         \ copy(l:palette.normal.left[1]) ] }
+  for l:mode in ['normal', 'insert', 'replace', 'visual', 'command']
+    if has_key(l:palette, l:mode) && has_key(l:palette[l:mode], 'left')
+      call add(l:palette[l:mode].left, ['#282A36', '#F1FA8C', 236, 228])
+    endif
+  endfor
+  let l:palette.normal.right = [ ['#F8F8F2', '#6272A4', 253, 61],
+        \ ['#8BE9FD', '#44475A', 117, 239] ]
   call lightline#init()
   call lightline#colorscheme()
   call lightline#update()
