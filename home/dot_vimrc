@@ -90,6 +90,12 @@ syntax enable                   " syntax highlighting
 if has('termguicolors')
   set termguicolors             " 24-bit color in capable terminals
 endif
+" Do not query the terminal for its fg/bg colors: processing the OSC
+" replies (seen with ghostty) clears user highlight groups, breaking
+" the statusline, and a light terminal fg flips 'background'. The
+" colorscheme pins colors explicitly, so autodetection is not needed.
+if exists('&t_RF') | set t_RF= | endif
+if exists('&t_RB') | set t_RB= | endif
 silent! colorscheme dracula     " package colorscheme; ignore if absent
 if !exists('g:colors_name')
   " Fallback for boxes without the dracula package
