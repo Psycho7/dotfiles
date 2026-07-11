@@ -120,7 +120,10 @@ endif
 " Inert when lightline is absent; the default statusline still works
 " Blocks are separated by background color changes, not | characters;
 " modified sits in its own block that only appears when the buffer is
-" dirty (lightline collapses groups whose components are all empty)
+" dirty (lightline collapses groups whose components are all empty).
+" Items inside a block are separated by a middle dot and carry an icon
+" prefix; icons are written as escapes to keep this file ASCII and
+" render via the Nerd Font glyphs bundled with the terminal font.
 let g:lightline = {
       \ 'colorscheme': 'dracula',
       \ 'active': {
@@ -128,8 +131,30 @@ let g:lightline = {
       \   'right': [ [ 'percent', 'lineinfo' ],
       \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
       \ },
-      \ 'subseparator': { 'left': '', 'right': '' },
+      \ 'component_function': {
+      \   'fileformat': 'LightlineFileformat',
+      \   'fileencoding': 'LightlineFileencoding',
+      \   'filetype': 'LightlineFiletype'
+      \ },
+      \ 'subseparator': { 'left': "\u00b7", 'right': "\u00b7" },
       \ }
+
+" OS logo matching the fileformat value; plain text for odd values
+function! LightlineFileformat() abort
+  let l:icons = { 'unix': "\ue712", 'dos': "\ue70f", 'mac': "\ue711" }
+  return has_key(l:icons, &fileformat)
+        \ ? l:icons[&fileformat] . ' ' . &fileformat : &fileformat
+endfunction
+
+" Language icon before the encoding (falls back to global encoding)
+function! LightlineFileencoding() abort
+  return "\uf1ab " . (&fileencoding !=# '' ? &fileencoding : &encoding)
+endfunction
+
+" File icon before the filetype
+function! LightlineFiletype() abort
+  return &filetype !=# '' ? "\uf0f6 " . &filetype : 'no ft'
+endfunction
 
 " Palette tweaks, applied at VimEnter (the palette autoload variable
 " needs the plugin present; the catch keeps a plugin-less box quiet):
