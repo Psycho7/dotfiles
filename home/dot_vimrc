@@ -96,6 +96,14 @@ endif
 " colorscheme pins colors explicitly, so autodetection is not needed.
 if exists('&t_RF') | set t_RF= | endif
 if exists('&t_RB') | set t_RB= | endif
+" Set before the colorscheme: dracula sets background=dark while it
+" loads, and if the value changes at that point vim resets the default
+" highlight groups, clobbering the colors the scheme just defined
+set background=dark
+" Packages normally load after the vimrc, but dracula needs its own
+" autoload files on runtimepath while its colors file is sourced, so
+" load packages first; silent! keeps vims without packages happy
+silent! packloadall
 silent! colorscheme dracula     " package colorscheme; ignore if absent
 if !exists('g:colors_name')
   " Fallback for boxes without the dracula package
