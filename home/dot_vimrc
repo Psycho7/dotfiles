@@ -133,7 +133,6 @@ let g:lightline = {
       \ },
       \ 'component_function': {
       \   'fileformat': 'LightlineFileformat',
-      \   'fileencoding': 'LightlineFileencoding',
       \   'filetype': 'LightlineFiletype'
       \ },
       \ 'subseparator': { 'left': "\u00b7", 'right': "\u00b7" },
@@ -145,10 +144,6 @@ function! LightlineFileformat() abort
   return get(l:names, &fileformat, &fileformat)
 endfunction
 
-" Font icon before the encoding (falls back to global encoding)
-function! LightlineFileencoding() abort
-  return "\uf031 " . (&fileencoding !=# '' ? &fileencoding : &encoding)
-endfunction
 
 " File icon before the filetype
 function! LightlineFiletype() abort
