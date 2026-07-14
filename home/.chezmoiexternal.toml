@@ -1,52 +1,42 @@
 # Vim plugins as native packages under ~/.vim/pack/mine/start.
 # Archives rather than git-repo clones so no .git directories land on disk.
-# exact = true prunes files that disappear upstream; refreshed weekly.
+# exact = true prunes files that disappear upstream.
+# URLs are pinned to commit SHAs: content is immutable, so no
+# refreshPeriod is needed. To update a plugin, resolve the new SHA with
+# git ls-remote and change the URL here, then chezmoi apply -R ~/.vim.
 
 [".vim/pack/mine/start/dracula"]
     type = "archive"
-    url = "https://github.com/dracula/vim/archive/refs/heads/master.tar.gz"
+    url = "https://github.com/dracula/vim/archive/4f068752154e70ef8e03d6a70992033fff20a165.tar.gz"
     exact = true
     stripComponents = 1
-    refreshPeriod = "168h"
 
 [".vim/pack/mine/start/lightline"]
     type = "archive"
-    url = "https://github.com/itchyny/lightline.vim/archive/refs/heads/master.tar.gz"
+    url = "https://github.com/itchyny/lightline.vim/archive/d042c506cb2e7a59112a72447e0b5fe8739d9d1d.tar.gz"
     exact = true
     stripComponents = 1
-    refreshPeriod = "168h"
 
 [".vim/pack/mine/start/bullets"]
     type = "archive"
-    url = "https://github.com/bullets-vim/bullets.vim/archive/refs/heads/master.tar.gz"
+    url = "https://github.com/bullets-vim/bullets.vim/archive/3f667eeca58bd4ba411b41edefef51e7fed1a2b1.tar.gz"
     exact = true
     stripComponents = 1
-    refreshPeriod = "168h"
 
 [".vim/pack/mine/start/surround"]
     type = "archive"
-    url = "https://github.com/tpope/vim-surround/archive/refs/heads/master.tar.gz"
+    url = "https://github.com/tpope/vim-surround/archive/3d188ed2113431cf8dac77be61b842acb64433d9.tar.gz"
     exact = true
     stripComponents = 1
-    refreshPeriod = "168h"
 
 [".vim/pack/mine/start/commentary"]
     type = "archive"
-    url = "https://github.com/tpope/vim-commentary/archive/refs/heads/master.tar.gz"
+    url = "https://github.com/tpope/vim-commentary/archive/64a654ef4a20db1727938338310209b6a63f60c9.tar.gz"
     exact = true
     stripComponents = 1
-    refreshPeriod = "168h"
 
 [".vim/pack/mine/start/repeat"]
     type = "archive"
-    url = "https://github.com/tpope/vim-repeat/archive/refs/heads/master.tar.gz"
+    url = "https://github.com/tpope/vim-repeat/archive/65846025c15494983dafe5e3b46c8f88ab2e9635.tar.gz"
     exact = true
     stripComponents = 1
-    refreshPeriod = "168h"
-
-[".vim/pack/mine/start/oscyank"]
-    type = "archive"
-    url = "https://github.com/ojroques/vim-oscyank/archive/refs/heads/main.tar.gz"
-    exact = true
-    stripComponents = 1
-    refreshPeriod = "168h"
