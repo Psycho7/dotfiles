@@ -199,16 +199,6 @@ augroup vimrc_filetypes
 augroup END
 
 " --------------------------------------------------------------------
-" Remote clipboard (OSC52)
-" --------------------------------------------------------------------
-" Explicit yank to the terminal clipboard for SSH boxes and containers
-" where clipboard=unnamed cannot reach the local machine. Inert when the
-" oscyank package is absent; unused locally where unnamed suffices.
-nmap <leader>y <Plug>OSCYankOperator
-nmap <leader>yy <leader>y_
-xmap <leader>y <Plug>OSCYankVisual
-
-" --------------------------------------------------------------------
 " Commands
 " --------------------------------------------------------------------
 " :W writes a root-owned file via sudo (useful over SSH)
