@@ -1,0 +1,218 @@
+" ~/.vimrc - owned minimal config, managed by chezmoi.
+" Plugins are vim native packages in ~/.vim/pack/mine/start, fetched by
+" chezmoi as archives. Everything below must load cleanly on a bare box
+" where those packages are absent and on vims older than 8.0.
+
+" --------------------------------------------------------------------
+" Leader
+" --------------------------------------------------------------------
+" Comma as leader; set before any mapping that uses it
+let mapleader = ","
+
+" --------------------------------------------------------------------
+" Files and buffers
+" --------------------------------------------------------------------
+set encoding=utf-8              " default to utf-8
+set fileformats=unix,dos,mac    " line-ending detection order
+set hidden                      " switch away from unsaved buffers
+set autoread                    " pick up outside changes to files
+set nobackup                    " no backup files ...
+set nowritebackup               " ... not even while writing
+set noswapfile                  " no swap files, no recovery prompts
+
+" Re-check for outside changes when vim regains focus or enters a buffer
+augroup vimrc_autoread
+  autocmd!
+  autocmd FocusGained,BufEnter * silent! checktime
+augroup END
+
+" Persistent undo across sessions, kept in one central directory
+if has('persistent_undo')
+  if !isdirectory(expand('~/.vim/undodir'))
+    call mkdir(expand('~/.vim/undodir'), 'p', 0700)
+  endif
+  set undodir=~/.vim/undodir    " central undo location
+  set undofile                  " save undo history per file
+endif
+
+" --------------------------------------------------------------------
+" UI
+" --------------------------------------------------------------------
+set number                      " absolute line numbers
+set ruler                       " line/column in the fallback statusline
+set scrolloff=7                 " keep context lines around the cursor
+set wildmenu                    " visual command-line completion
+set laststatus=2                " always show the statusline
+set noshowmode                  " statusline shows the mode; no duplicate
+set showcmd                     " show pending keys of a command
+
+" --------------------------------------------------------------------
+" Search
+" --------------------------------------------------------------------
+set ignorecase                  " case-insensitive search ...
+set smartcase                   " ... unless the pattern has capitals
+set incsearch                   " jump to matches while typing
+set hlsearch                    " highlight all matches
+
+" --------------------------------------------------------------------
+" Indentation
+" --------------------------------------------------------------------
+set expandtab                   " spaces, never tab characters
+set smarttab                    " shiftwidth at line start, tabstop elsewhere
+set shiftwidth=4                " indent step
+set tabstop=4                   " tab display width
+set autoindent                  " carry indent over to new lines
+" No smartindent: filetype indent scripts handle language-aware indent
+filetype plugin indent on       " filetype detection, ftplugins, indent
+
+" --------------------------------------------------------------------
+" Prose and wrapping
+" --------------------------------------------------------------------
+set wrap                        " soft-wrap long lines
+set linebreak                   " wrap at word boundaries, not mid-word
+if exists('+breakindent')
+  set breakindent               " align wrapped text under the line indent
+endif
+
+" --------------------------------------------------------------------
+" Input
+" --------------------------------------------------------------------
+set mouse=a                     " mouse for clicks, selection, scrolling
+set backspace=indent,eol,start  " backspace over everything in insert mode
+if has('clipboard')
+  set clipboard=unnamed         " yank/put through the system clipboard
+endif
+
+" --------------------------------------------------------------------
+" Colors
+" --------------------------------------------------------------------
+syntax enable                   " syntax highlighting
+if has('termguicolors')
+  set termguicolors             " 24-bit color in capable terminals
+endif
+" Do not query the terminal for its fg/bg colors: processing the OSC
+" replies (seen with ghostty) clears user highlight groups, breaking
+" the statusline, and a light terminal fg flips 'background'. The
+" colorscheme pins colors explicitly, so autodetection is not needed.
+if exists('&t_RF') | set t_RF= | endif
+if exists('&t_RB') | set t_RB= | endif
+" Set before the colorscheme: dracula sets background=dark while it
+" loads, and if the value changes at that point vim resets the default
+" highlight groups, clobbering the colors the scheme just defined
+set background=dark
+" Packages normally load after the vimrc, but dracula needs its own
+" autoload files on runtimepath while its colors file is sourced, so
+" load packages first; silent! keeps vims without packages happy
+silent! packloadall
+silent! colorscheme dracula     " package colorscheme; ignore if absent
+if !exists('g:colors_name')
+  " Fallback for boxes without the dracula package
+  try
+    colorscheme habamax         " built-in since vim 9
+  catch
+    colorscheme desert          " built-in everywhere
+  endtry
+endif
+
+" --------------------------------------------------------------------
+" Statusline (lightline)
+" --------------------------------------------------------------------
+" Inert when lightline is absent; the default statusline still works
+" Blocks are separated by background color changes, not | characters;
+" modified sits in its own block that only appears when the buffer is
+" dirty (lightline collapses groups whose components are all empty).
+" Items inside a block are separated by a middle dot and carry an icon
+" prefix; icons are written as escapes to keep this file ASCII and
+" render via the Nerd Font glyphs bundled with the terminal font.
+let g:lightline = {
+      \ 'colorscheme': 'dracula',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ], [ 'filename' ], [ 'modified' ] ],
+      \   'right': [ [ 'percent', 'lineinfo' ],
+      \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
+      \ },
+      \ 'component_function': {
+      \   'fileformat': 'LightlineFileformat',
+      \   'filetype': 'LightlineFiletype'
+      \ },
+      \ 'subseparator': { 'left': "\u00b7", 'right': "\u00b7" },
+      \ }
+
+" Line endings named as editors show them: LF, CRLF, or CR
+function! LightlineFileformat() abort
+  let l:names = { 'unix': 'LF', 'dos': 'CRLF', 'mac': 'CR' }
+  return get(l:names, &fileformat, &fileformat)
+endfunction
+
+
+" File icon before the filetype
+function! LightlineFiletype() abort
+  return &filetype !=# '' ? "\uf0f6 " . &filetype : 'no ft'
+endfunction
+
+" Palette tweaks, applied at VimEnter (the palette autoload variable
+" needs the plugin present; the catch keeps a plugin-less box quiet):
+" - command mode: the theme has no entry for it, so it falls back to
+"   normal purple; give it cyan to make : mode visible at a glance
+" - modified: third left block, black on yellow, added for every mode
+" - right side: position block in slate, file metadata block in gray,
+"   constant across modes so only the mode block signals the mode
+function! s:TweakLightlinePalette() abort
+  try
+    let l:palette = g:lightline#colorscheme#dracula#palette
+  catch
+    return
+  endtry
+  let l:palette.command = { 'left': [ ['#282A36', '#8BE9FD', 236, 117],
+        \ copy(l:palette.normal.left[1]) ] }
+  for l:mode in ['normal', 'insert', 'replace', 'visual', 'command']
+    if has_key(l:palette, l:mode) && has_key(l:palette[l:mode], 'left')
+      call add(l:palette[l:mode].left, ['#282A36', '#F1FA8C', 236, 228])
+    endif
+  endfor
+  let l:palette.normal.right = [ ['#F8F8F2', '#6272A4', 253, 61],
+        \ ['#8BE9FD', '#44475A', 117, 239] ]
+  call lightline#init()
+  call lightline#colorscheme()
+  call lightline#update()
+endfunction
+augroup vimrc_lightline_palette
+  autocmd!
+  autocmd VimEnter * call s:TweakLightlinePalette()
+augroup END
+
+" --------------------------------------------------------------------
+" Markdown and lists
+" --------------------------------------------------------------------
+" Highlight fenced code blocks via the built-in markdown syntax
+let g:markdown_fenced_languages =
+      \ ['python', 'bash=sh', 'javascript', 'json', 'yaml', 'vim']
+
+" bullets.vim: Enter continues a list aligned with its sibling, Enter on
+" an empty item ends the list, Ctrl-t / Ctrl-d indent/dedent in insert
+let g:bullets_enabled_file_types = ['markdown', 'text', 'gitcommit']
+
+" 2-space indent for prose-adjacent formats
+augroup vimrc_filetypes
+  autocmd!
+  autocmd FileType markdown,yaml setlocal shiftwidth=2 tabstop=2 softtabstop=2
+augroup END
+
+" --------------------------------------------------------------------
+" Commands
+" --------------------------------------------------------------------
+" :W writes a root-owned file via sudo (useful over SSH)
+command! W execute 'w !sudo tee % > /dev/null' <bar> edit!
+
+" --------------------------------------------------------------------
+" Autocmds
+" --------------------------------------------------------------------
+augroup vimrc_restore_cursor
+  autocmd!
+  " Reopen files at the last cursor position; skipping commit buffers
+  " leaves git commits starting at line 1
+  autocmd BufReadPost *
+        \ if line("'\"") >= 1 && line("'\"") <= line('$') && &filetype !~# 'commit'
+        \ |   execute 'normal! g`"'
+        \ | endif
+augroup END
