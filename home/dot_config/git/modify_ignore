@@ -9,6 +9,7 @@ existing=$(cat)
 managed=$(cat <<'BLOCK'
 # BEGIN chezmoi managed
 **/.claude/settings.local.json
+**/.claude/.cc-writes/
 **/docs/superpowers/
 # END chezmoi managed
 BLOCK
@@ -27,5 +28,10 @@ while IFS= read -r line; do
   fi
 done <<< "$existing"
 
-# Append managed block
-printf '%s%s\n' "$output" "$managed"
+# Append managed block, trimming trailing blank lines from user content
+output=$(printf '%s' "$output")
+if [ -n "$output" ]; then
+  printf '%s\n%s\n' "$output" "$managed"
+else
+  printf '%s\n' "$managed"
+fi
