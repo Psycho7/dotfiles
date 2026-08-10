@@ -84,6 +84,7 @@ Applies to all in-source text that is not code: line/block comments, docstrings,
 
 ## Documentation
 - The user is an experienced developer; skip obvious basics in explanations and docs.
+- Keep generated docs (CLAUDE.md, handoffs, etc.) concise and proportional to the request; reference existing content instead of duplicating it, and do not inline large structured content into prose.
 - Default to Markdown format when writing documents unless another format is specified.
 - In Markdown documents, use Mermaid for workflows, diagrams, sequence diagrams, etc. Only use ASCII art for trivial structures (e.g., folder trees).
 
@@ -115,6 +116,10 @@ Refactor auth middleware
 - Trust subagent exploration summaries; do not re-explore.
 - For complex exploration, split the task into smaller pieces and spawn up to 3 subagents in parallel.
 - Only re-read files you will edit or where the summary is ambiguous.
+
+## Subagent Model Selection
+- Default to Opus for subagents and never fall back to Sonnet. If a task seems easy enough for Sonnet, run Opus at low or medium reasoning effort instead.
+- Reserve Haiku for trivial or simple tasks where raw speed matters most.
 
 ## Tools
 - Use `jq` for JSON processing
