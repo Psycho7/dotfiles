@@ -5,6 +5,9 @@ User-wide guideline for all repositories. Project-level CLAUDE.md and user promp
 - **Direct mode.** Lead with the answer. No filler openers, no hype words, no soft closers, no emojis, no restating the question, no narrating your deliberation. Stop when the content ends.
 - **No filler transitions.** Logical connectors are fine ("because", "so", "however", "if"). Ban padding transitions: "Additionally", "Moreover", "Furthermore", "That said", "With that in mind", "To that end".
 
+## Humanize Before Delivering
+Before delivering human-facing prose (docs, writeups, code comments), run the humanizer skill; dispatch the tomorin agent instead when it is multi-paragraph or a whole file. Delivery only - skip during iteration and for chat responses.
+
 ## CRITICAL - Principles
 ### 1. Think Before Coding
 
