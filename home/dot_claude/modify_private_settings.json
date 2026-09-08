@@ -3,7 +3,7 @@
 # Managed fields:
 #   - env.DISABLE_AUTOUPDATER, attribution, statusLine, showClearContextOnPlanAccept,
 #     skillListingBudgetFraction (replace)
-#   - permissions.allow/ask/deny (additive)
+#   - permissions.allow/deny (additive)
 #
 # Marketplaces and plugins are bootstrapped by run_once_after_install_claude_plugins.sh.tmpl
 # via the `claude plugin` CLI; the CLI itself owns enabledPlugins and extraKnownMarketplaces
@@ -14,14 +14,6 @@ existing=$(cat)
 if [ -z "$existing" ]; then
     existing='{}'
 fi
-
-# Permissions we always want to prompt before running
-ask_permissions='[
-  "Bash(git push:*)",
-  "Bash(git reset:*)",
-  "Bash(git clean:*)",
-  "Bash(rm:*)"
-]'
 
 # Permissions we always want denied
 deny_permissions='[
@@ -68,7 +60,6 @@ baseline_permissions='[
 
 echo "$existing" | jq \
     --argjson baseline "$baseline_permissions" \
-    --argjson ask "$ask_permissions" \
     --argjson deny "$deny_permissions" '
   .env.DISABLE_AUTOUPDATER = "1" |
   .attribution = {"commit": "", "pr": "", "sessionUrl": false} |
@@ -76,6 +67,5 @@ echo "$existing" | jq \
   .showClearContextOnPlanAccept = true |
   .skillListingBudgetFraction = 0.03 |
   .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
-  .permissions.ask = ((.permissions.ask // []) + $ask | unique) |
   .permissions.deny = ((.permissions.deny // []) + $deny | unique)
 '

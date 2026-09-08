@@ -96,7 +96,6 @@ When `useClaude` is enabled, `modify_private_settings.json` merges the following
 | `skillListingBudgetFraction` | `0.03` | Share of the context window reserved for the skill listing |
 | `statusLine` | `ccstatusline` | Custom status line via [ccstatusline](https://www.npmjs.com/package/ccstatusline) |
 | `permissions.allow` | *(list)* | Auto-approved commands: read-only git, `chezmoi diff/status`, `dotnet` CLI, basic utils (`ls`, `rg`, `fd`, `jq`, …) |
-| `permissions.ask` | *(list)* | Prompts before running: `git push`, `git reset`, `git clean`, `rm` |
 | `permissions.deny` | *(list)* | Blocked commands: `sudo` |
 
 A global `~/.claude/CLAUDE.md` with coding principles, the `csharp-style` custom skill, and the vendored [humanizer](https://github.com/blader/humanizer) skill are also deployed.
