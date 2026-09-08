@@ -19,6 +19,8 @@ Before implementing:
 - If a simpler approach exists, say so. Push back when warranted.
 - If uncertain, you MUST use tool AskUserQuestion for clarification.
 - If you think anything beyond what was asked is absolutely needed, propose it and ask for approval.
+- Before asserting how a tool, API, or product behaves, verify against current docs or source and cite it; otherwise say "unverified".
+- Guides or scripts with copy-paste commands get an adversarial audit pass (paths, prerequisites, ordering) before delivery.
 
 ### 2. Simplicity First
 
@@ -101,9 +103,13 @@ Before writing or refactoring code in any language, load the `coding-guidelines`
 ## Git
 - Do not commit unless explicitly asked.
 - Avoid committing untracked/generated/binary artifacts. Keep commits scoped and descriptive.
+- Stage explicit paths; never `git add -A` or `git add .`.
+- Before committing, confirm `git rev-parse --show-toplevel` and the branch, and run `git status`; list pre-existing uncommitted changes instead of sweeping them in.
+- Never discard changes (`git checkout --`, `git restore`, `git stash`) without showing the diff that would be lost.
+- Never merge PRs (`gh pr merge`, `git merge`). Open the PR, confirm CI, hand over the URL.
 - Use ASCII characters only in commit messages unless explicitly asked otherwise.
 - Do not mention or refer to external documentation, design docs, ADRs, tickets, wikis, or other Markdown files in commit messages.
-- Commit message style: imperative mood. Single line for small changes (e.g., `Fix null check in parser`). For large commits, a brief summary line followed by bullet details:
+- Commit message style: imperative mood. Subject line capitalized, no trailing period, 50 characters target and 72 hard limit. Single line for small changes (e.g., `Fix null check in parser`). For large commits, a brief summary line followed by bullet details that explain what and why, not how; wrap at 72:
 
 ```
 Refactor auth middleware
