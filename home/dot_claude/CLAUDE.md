@@ -6,7 +6,7 @@ User-wide guideline for all repositories. Project-level CLAUDE.md and user promp
 - **No filler transitions.** Logical connectors are fine ("because", "so", "however", "if"). Ban padding transitions: "Additionally", "Moreover", "Furthermore", "That said", "With that in mind", "To that end".
 
 ## Humanize Before Delivering
-Before delivering human-facing prose (docs, writeups, code comments), run the humanizer skill; dispatch the tomorin agent instead when it is multi-paragraph or a whole file. Delivery only - skip during iteration and for chat responses.
+Before delivering human-facing prose (docs, writeups), run the humanizer skill in embedded mode (return only the final text); dispatch the tomorin agent instead when it is longer than a paragraph or a whole file. Delivery only - skip during iteration, for chat responses, and for code comments (coding-guidelines covers those). Commands, config blocks, and code fences stay byte-identical.
 
 ## CRITICAL - Principles
 ### 1. Think Before Coding
@@ -80,10 +80,8 @@ Skip simplification entirely for throwaway, exploratory, or prototype code.
 - Verify paths, files, and scope with a real read/grep before launching a workflow or fan-out. Never size work off unverified bash output, invented filenames, or stale summaries.
 - Skip a workflow when doing it inline is faster.
 
-## Code Comments
-Applies to all in-source text that is not code: line/block comments, docstrings, TODO/FIXME/NOTE markers, license/file headers.
-- Use ASCII characters only unless explicitly asked otherwise (no em-dashes, smart quotes, Unicode arrows, non-ASCII symbols).
-- Do not mention or refer to external documentation, design docs, ADRs, tickets, wikis, or other Markdown files.
+## Coding Guidelines
+Before writing or refactoring code in any language, load the `coding-guidelines` skill. Language-specific skills (e.g. `csharp-style`) build on it.
 
 ## Documentation
 - The user is an experienced developer; skip obvious basics in explanations and docs.

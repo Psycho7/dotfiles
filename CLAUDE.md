@@ -67,7 +67,13 @@ The Claude `modify_private_settings.json` uses `jq` to additively merge baseline
 - **Fish shell**: `dot_config/fish/modify_config.fish.tmpl` + functions in `dot_config/fish/functions/`
 - **PowerShell**: `Documents/PowerShell/modify_Microsoft.PowerShell_profile.ps1.ps1`
 - **Starship prompt**: `dot_config/starship.toml`
-- **Claude Code**: `dot_claude/CLAUDE.md`, `dot_claude/modify_private_settings.json`, `dot_claude/skills/`
+- **Claude Code**: `dot_claude/CLAUDE.md`, `dot_claude/modify_private_settings.json`, `dot_claude/skills/`, `dot_claude/rules/`
+
+### Claude Code Asset Gotchas
+
+- `paths` globs in skill or rule frontmatter must be `**/*.{ext,...}`; a bare `*.py` never matches.
+- A `paths` rule injects its body on file read; a `paths` skill is only listed. `rules/coding-guidelines.md` therefore points at the `coding-guidelines` skill instead of duplicating it.
+- Skills and agents are indexed at session start; a live check needs a fresh `claude -p` session, which costs tokens, so only run one when asked.
 
 ### What's Excluded
 
