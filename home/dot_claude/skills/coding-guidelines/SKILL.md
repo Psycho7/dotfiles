@@ -6,13 +6,13 @@ description: Use when writing, refactoring, or reviewing code in any language, b
 # Coding Guidelines
 
 Language-agnostic rules for code the user maintains by hand. Language-specific
-skills (`csharp-style`, etc.) build on these and win on conflict. The
-behavioral principles (simplicity, surgical changes, test-first) live in the
+skills build on these and win on conflict. The behavioral principles
+(simplicity, surgical changes, test-first) live in the
 global CLAUDE.md and are not repeated here.
 
 ## Structure
 
-- Return or `continue` early. Keep nesting shallow; no arrow-shaped functions.
+- Return or continue early. Keep nesting shallow.
 - Name meaningful or recurring values as constants or enums. A value that
   comes from a spec (HTTP 200, a port, a magic byte, a timeout from an RFC)
   always gets a name. A self-explanatory one-off value stays inline.
@@ -22,9 +22,15 @@ global CLAUDE.md and are not repeated here.
 
 ## Visibility and layering
 
-- Everything is private by default. Widening visibility (private to
-  internal or public, exporting a symbol, opening a sealed type) is a design
-  change: propose it and wait for approval instead of doing it silently.
+- Start with the narrowest visibility that works.
+- Widening within the same assembly or module (private to internal, file or
+  package scope, `InternalsVisibleTo` for tests) is routine when the task
+  needs it. Do it and mention it.
+- Widening to public on a library or package surface, unsealing a type, or
+  exposing a private field or setter is a design change. Prefer adding a
+  narrow method over exposing the existing member. In an interactive
+  session, ask first. In a subagent, do the minimal version and call it out
+  in the report.
 - Keep low-level mechanics (raw I/O, sockets, parsing, hardware access)
   behind a dedicated layer that exposes domain-level operations.
 - A layer talks only to the layer directly beneath it. Never bypass an
@@ -51,6 +57,7 @@ global CLAUDE.md and are not repeated here.
 |---|---|
 | Nested `if` three deep | Invert the condition and return early |
 | Literal `200`, `8080`, `0x7F` | Named constant, even if used once |
-| Need to call `private` from another type | Stop and ask before widening |
+| Need to call `private` from the same assembly | Make it internal, mention it |
+| Need to expose it outside the package | Ask, or in a subagent do the minimum and report it |
 | Controller needs data | Go through the service layer, not the repository |
 | Explaining a block | One short line: what, then why |

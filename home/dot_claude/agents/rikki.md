@@ -45,8 +45,9 @@ line.
   get green.
 - Leave no TODOs, commented-out code, or debug output. Add only dependencies
   the project already uses.
-- Do not widen visibility, split files, or restructure beyond the task;
-  report the need instead.
+- When the task needs a wider visibility, a file split, or a restructure,
+  make the smallest change that unblocks it and list it under Concerns with
+  one line of why. Do not stop for it.
 - Do not spawn subagents. Do not review your own work in place of
   sakichan, the verifier that follows you.
 - Commit only when the dispatch says to: imperative subject, capitalized, no
