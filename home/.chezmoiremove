@@ -1,0 +1,3 @@
+{{- if .useClaude }}
+.claude/commands/review-committee.md
+{{- end }}
