@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Dotfiles managed with [chezmoi](https://www.chezmoi.io/). The chezmoi source root is `home/` (per `.chezmoiroot`), which maps to `$HOME` on the target machine.
 
-Use the `chezmoi` skill when creating or modifying chezmoi-managed files — it covers file type selection, template syntax, modify scripts, cross-platform handling, and `.chezmoiignore` configuration.
+Use the `chezmoi-cookbook:manage-dotfiles` skill when creating or modifying chezmoi-managed files (installed at user scope by the plugin bootstrap; `.claude/settings.json` also enables it for this repo) — it covers file type selection, template syntax, modify scripts, cross-platform handling, and `.chezmoiignore` configuration.
 
 ## Key Commands
 
@@ -47,11 +47,12 @@ When in doubt, ask before expanding a platform's surface beyond what is listed a
 
 Files prefixed `modify_` implement a "managed block" merge: they preserve user customizations outside a `# BEGIN chezmoi managed` / `# END chezmoi managed` block while injecting chezmoi-owned content. This is the preferred pattern for config files users also edit manually (fish config, git ignore, PowerShell profile, Claude settings).
 
-The Claude `modify_settings.json` uses `jq` to additively merge baseline permissions — it never removes permissions the user has added locally.
+The Claude `modify_private_settings.json` uses `jq` to additively merge baseline permissions — it never removes permissions the user has added locally.
 
 ### Platform Handling
 
 - `home/.chezmoiignore` excludes platform-specific files (PowerShell on non-Windows; fish/git-ignore/Claude on Windows; Tailscale fish functions on non-macOS; fish `conf.d` everywhere)
+- The `useClaude` prompt (always false on Windows) gates every Claude asset. `.claude/` is excluded as a whole; any Claude-adjacent file outside it (`glm.fish`, ccstatusline config, the plugin bootstrap script) must be listed by hand under the `not .useClaude` block
 - Templates use `{{ if eq .chezmoi.os "darwin" }}` guards
 - `run_once_00_install_packages.sh.tmpl` handles macOS (Homebrew) and Linux (apt + manual installers); `.ps1.tmpl` handles Windows (winget)
 - The Linux branch intentionally installs no fonts or GUI packages — the Linux target is headless (WSL/VM), so there is no `desktop-vs-headless` split to maintain
@@ -66,7 +67,7 @@ The Claude `modify_settings.json` uses `jq` to additively merge baseline permiss
 - **Fish shell**: `dot_config/fish/modify_config.fish.tmpl` + functions in `dot_config/fish/functions/`
 - **PowerShell**: `Documents/PowerShell/modify_Microsoft.PowerShell_profile.ps1.ps1`
 - **Starship prompt**: `dot_config/starship.toml`
-- **Claude Code**: `dot_claude/CLAUDE.md`, `dot_claude/modify_settings.json`, `dot_claude/skills/`
+- **Claude Code**: `dot_claude/CLAUDE.md`, `dot_claude/modify_private_settings.json`, `dot_claude/skills/`
 
 ### What's Excluded
 

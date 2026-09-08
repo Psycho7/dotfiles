@@ -1,7 +1,8 @@
 #!/bin/bash
 # Merges managed fields into existing settings.json, preserving everything else.
 # Managed fields:
-#   - env.DISABLE_AUTOUPDATER, attribution, statusLine, showClearContextOnPlanAccept (replace)
+#   - env.DISABLE_AUTOUPDATER, attribution, statusLine, showClearContextOnPlanAccept,
+#     skillListingBudgetFraction (replace)
 #   - permissions.allow/ask/deny (additive)
 #
 # Marketplaces and plugins are bootstrapped by run_once_after_install_claude_plugins.sh.tmpl
