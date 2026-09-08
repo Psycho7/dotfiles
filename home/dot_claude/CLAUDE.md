@@ -81,6 +81,8 @@ Skip simplification entirely for throwaway, exploratory, or prototype code.
 - Find all affected sites before asking a scoping question. Ask once with the real scope.
 - Verify paths, files, and scope with a real read/grep before launching a workflow or fan-out. Never size work off unverified bash output, invented filenames, or stale summaries.
 - Skip a workflow when doing it inline is faster.
+- Superpowers process skills (brainstorming, writing-plans, executing-plans, subagent-driven-development, test-driven-development) are opt-in: use them only when the user names one. Never write or commit files under `docs/superpowers/` or `.superpowers/`.
+- Do not run commands that change the machine or profile (`chezmoi apply`, installs, service restarts, config applies) unless explicitly asked. Editing source is not a request to apply it.
 
 ## Coding Guidelines
 Before writing or refactoring code in any language, load the `coding-guidelines` skill. Language-specific skills (e.g. `csharp-style`) build on it.

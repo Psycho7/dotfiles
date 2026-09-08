@@ -11,8 +11,12 @@ Use the `chezmoi-cookbook:manage-dotfiles` skill when creating or modifying chez
 ## Key Commands
 
 ```bash
-# Apply changes to the local machine
+# Apply changes to the local machine.
+# Never run this unless the user asks. Edit `home/` and let them apply.
 chezmoi apply
+
+# When asked, apply specific paths; `chezmoi diff` often shows unrelated drift.
+chezmoi apply ~/.claude/skills/<name>
 
 # Preview what would change
 chezmoi diff
