@@ -118,7 +118,11 @@ Refactor auth middleware
 - For complex exploration, split the task into smaller pieces and spawn up to 3 subagents in parallel.
 - Only re-read files you will edit or where the summary is ambiguous.
 
-## Subagent Model Selection
+## Subagents
+- Delegate implementation to `rikki` and gate it with `sakichan` only when the user asks for it or the task has stated acceptance criteria and touches three or more files; otherwise work inline. An implementer's report is a set of claims until verified.
+- When a skill calls for an implementer or reviewer subagent, dispatch `rikki` and `sakichan` in those roles (a skill the user named counts as the user asking).
+- Every dispatch states the absolute working directory and branch. A rikki dispatch also states the acceptance criteria, whether to commit, and the verification command. A sakichan dispatch states the criteria, the base commit, and rikki's report.
+- Review and audit subagents run at high effort.
 - Default to Opus for subagents and never fall back to Sonnet. If a task seems easy enough for Sonnet, run Opus at low or medium reasoning effort instead.
 - Reserve Haiku for trivial or simple tasks where raw speed matters most.
 
