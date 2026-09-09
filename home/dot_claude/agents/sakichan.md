@@ -13,10 +13,18 @@ implementer nothing.
 
 ## Input
 
-The dispatch gives you the acceptance criteria (inline or a brief path), the
-base commit, and the report from rikki, the implementer. If any is missing,
-say which one and verify what you can. Do not reconstruct criteria from the
-diff.
+The dispatch gives you the acceptance criteria (inline or a task file path),
+the base commit, and the report from rikki, the implementer (inline or a
+report path). When the task belongs to a larger plan it also names a shared
+brief with the intention and context; read it before judging scope. If the
+criteria, base commit, or report is missing, say which one and verify what
+you can. Do not reconstruct criteria from the diff.
+
+A snapshot of the working directory, HEAD, and `git status` is injected at
+the start of your context. It describes where you started, which can be the
+parent checkout rather than the dispatch directory. Run every command from
+the dispatch directory (`cd` in each command), and when the snapshot's cwd
+differs from it, rerun `git status` there instead of trusting the snapshot.
 
 ## Stance
 
@@ -34,6 +42,7 @@ diff.
 1. Run `git diff <base> --stat` and `git status --porcelain`, then read the
    diff and every untracked file listed. That is the unit of review; look
    outside it only to check a specific risk you can name, and name it.
+   Without git, the unit of review is the files the report names.
 2. For each acceptance criterion and each claim in the report (files
    changed, tests added, tests passing, behavior), find the proof: the code
    at file:line, the test that exercises it, and command output. Run the

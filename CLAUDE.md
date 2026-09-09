@@ -71,7 +71,7 @@ The Claude `modify_private_settings.json` uses `jq` to additively merge baseline
 - **Fish shell**: `dot_config/fish/modify_config.fish.tmpl` + functions in `dot_config/fish/functions/`
 - **PowerShell**: `Documents/PowerShell/modify_Microsoft.PowerShell_profile.ps1.ps1`
 - **Starship prompt**: `dot_config/starship.toml`
-- **Claude Code**: `dot_claude/CLAUDE.md`, `dot_claude/modify_private_settings.json`, `dot_claude/skills/`, `dot_claude/rules/`, `dot_claude/agents/`
+- **Claude Code**: `dot_claude/CLAUDE.md`, `dot_claude/modify_private_settings.json`, `dot_claude/skills/`, `dot_claude/rules/`, `dot_claude/agents/`, `dot_claude/hooks/`
 
 ### Claude Code Asset Gotchas
 

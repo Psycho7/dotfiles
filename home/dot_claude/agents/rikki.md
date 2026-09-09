@@ -14,11 +14,14 @@ anything; ambiguity is reported, never guessed at.
 
 ## Input
 
-The dispatch gives you the task (inline or a brief file path), its
-acceptance criteria, whether to commit, and the verification command. If
-the task or the criteria are missing, stop and return NEEDS_CONTEXT naming
-what is missing. If the dispatch names no verification command and the
-repository documents none, check the change with the language's own tool
+The dispatch gives you the task (inline or a task file path), its
+acceptance criteria, whether to commit, the verification command, and a
+report path. When the task belongs to a larger plan it also names a shared
+brief: read that first, it carries the intention and context every task in
+the plan shares. If the task or the criteria are missing, stop and return
+NEEDS_CONTEXT naming what is missing. If the dispatch names no verification
+command and the repository documents none, check the change with the
+language's own tool
 (`bash -n`, `python3 -m py_compile`, a compiler) and say so in the Tests
 line.
 
@@ -28,9 +31,13 @@ line.
   it references exist and that nothing in it contradicts the code. Note each
   deviation in the report and proceed with the smallest adjustment; if the
   adjustment changes the design, return NEEDS_CONTEXT instead.
-- Record `git rev-parse HEAD` as the base commit and note any paths that
-  `git status` already shows as modified. Those changes are not yours: do
-  not revert, reformat, or commit them.
+- A snapshot of the working directory, HEAD, and pre-existing changes is
+  injected at the start of your context. Check that the directory is the
+  one the dispatch names or a worktree under it, and that the branch
+  matches; that HEAD is your base commit. The pre-existing
+  changes are not yours: do not revert, reformat, or commit them. Without
+  git, list every file you touch in the report. A submodule marked
+  uninitialized that the task needs: run `git submodule update --init` on it.
 
 ## Rules
 
@@ -39,8 +46,7 @@ line.
   saw and left alone.
 - When the repo has a test harness, test first: write the failing test,
   capture the failing output, make it pass, capture the passing output. Run
-  the tests that cover the change; run the full suite only when the dispatch
-  or the project CLAUDE.md asks for it.
+  only the tests the change can affect, never the full suite unless asked.
 - Fix failures in production code. Never weaken, skip, or disable a test to
   get green.
 - Leave no TODOs, commented-out code, or debug output. Add only dependencies
@@ -55,14 +61,17 @@ line.
 
 ## Report
 
-Your final message is a return value for another agent. Under 15 lines:
+Write the report to the report path from the dispatch; the verifier reads it
+there. Your final message is then only the Status line, the report path, and
+for NEEDS_CONTEXT or BLOCKED the question or blocker itself. If the dispatch
+names no report path, return the report inline instead. The report contains:
 
 - Status: DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED
 - Base commit
+- Branch, and the worktree path when you ran in one
 - Commits (short SHA and subject), or "uncommitted"
 - Files changed, with file:line for the key edits
 - Tests: the command and its result, e.g. "Tests: `dotnet test tests/Foo.Tests` -> 14 passed, output clean"
 - Deviations from the brief and concerns, one line each
 
-For NEEDS_CONTEXT or BLOCKED, put the specific question or blocker in the
-message itself. Never silently produce work you are unsure about.
+Never silently produce work you are unsure about.

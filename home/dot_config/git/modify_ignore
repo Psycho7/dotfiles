@@ -10,6 +10,7 @@ managed=$(cat <<'BLOCK'
 # BEGIN chezmoi managed
 **/.claude/settings.local.json
 **/.claude/.cc-writes/
+**/.claude/worktrees/
 **/docs/superpowers/
 # END chezmoi managed
 BLOCK

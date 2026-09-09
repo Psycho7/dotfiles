@@ -2,8 +2,10 @@
 # Merges managed fields into existing settings.json, preserving everything else.
 # Managed fields:
 #   - env.DISABLE_AUTOUPDATER, attribution, statusLine, showClearContextOnPlanAccept,
-#     skillListingBudgetFraction (replace)
+#     skillListingBudgetFraction, askUserQuestionTimeout, hooks.SubagentStart,
+#     worktree.baseRef (replace)
 #   - permissions.allow/deny (additive)
+# hooks.SubagentStart is replaced as a whole; other hook events are left alone.
 #
 # Marketplaces and plugins are bootstrapped by run_once_after_install_claude_plugins.sh.tmpl
 # via the `claude plugin` CLI; the CLI itself owns enabledPlugins and extraKnownMarketplaces
@@ -66,6 +68,9 @@ echo "$existing" | jq \
   .statusLine = {"type": "command", "command": "bunx -y ccstatusline@latest", "padding": 0} |
   .showClearContextOnPlanAccept = true |
   .skillListingBudgetFraction = 0.03 |
+  .askUserQuestionTimeout = "60s" |
+  .worktree.baseRef = "head" |
+  .hooks.SubagentStart = [{"matcher": "rikki|sakichan", "hooks": [{"type": "command", "command": "\"$HOME/.claude/hooks/subagent-context.fish\"", "timeout": 10}]}] |
   .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
   .permissions.deny = ((.permissions.deny // []) + $deny | unique)
 '

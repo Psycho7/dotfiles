@@ -77,11 +77,10 @@ Skip simplification entirely for throwaway, exploratory, or prototype code.
 
 ## Interaction and Tooling Discipline
 
-- When calling AskUserQuestion, ask and STOP. No edits, actions, or agent dispatches in the same turn; act only after the answer arrives. Never pre-commit to a guessed option.
+- When calling AskUserQuestion, ask and STOP. Never pre-commit to a guessed option. If it times out unanswered, take the most conservative reading, carry it as a stated assumption, and lead the final report with it.
 - Find all affected sites before asking a scoping question. Ask once with the real scope.
 - Verify paths, files, and scope with a real read/grep before launching a workflow or fan-out. Never size work off unverified bash output, invented filenames, or stale summaries.
 - Skip a workflow when doing it inline is faster.
-- Superpowers process skills (brainstorming, writing-plans, executing-plans, subagent-driven-development, test-driven-development) are opt-in: use them only when the user names one. Never write or commit files under `docs/superpowers/` or `.superpowers/`.
 - Do not run commands that change the machine or profile (`chezmoi apply`, installs, service restarts, config applies) unless explicitly asked. Editing source is not a request to apply it.
 
 ## Coding Guidelines
@@ -108,7 +107,7 @@ Before writing or refactoring code in any language, load the `coding-guidelines`
 - Stage explicit paths; never `git add -A` or `git add .`.
 - Before committing, confirm `git rev-parse --show-toplevel` and the branch, and run `git status`; list pre-existing uncommitted changes instead of sweeping them in.
 - Never discard changes (`git checkout --`, `git restore`, `git stash`) without showing the diff that would be lost.
-- Never merge PRs (`gh pr merge`, `git merge`). Open the PR, confirm CI, hand over the URL.
+- Never merge PRs (`gh pr merge`, `git merge`). Open the PR, confirm CI, hand over the URL. Integrating a subagent worktree branch locally is the one exception.
 - Use ASCII characters only in commit messages unless explicitly asked otherwise.
 - Do not mention or refer to external documentation, design docs, ADRs, tickets, wikis, or other Markdown files in commit messages.
 - Commit message style: imperative mood. Subject line capitalized, no trailing period, 50 characters target and 72 hard limit. Single line for small changes (e.g., `Fix null check in parser`). For large commits, a brief summary line followed by bullet details that explain what and why, not how; wrap at 72:
@@ -130,6 +129,11 @@ Refactor auth middleware
 - Delegate implementation to `rikki` and gate it with `sakichan` only when the user asks for it or the task has stated acceptance criteria and touches three or more files; otherwise work inline. An implementer's report is a set of claims until verified.
 - When a skill calls for an implementer or reviewer subagent, dispatch `rikki` and `sakichan` in those roles (a skill the user named counts as the user asking).
 - Every dispatch states the absolute working directory and branch. A rikki dispatch also states the acceptance criteria, whether to commit, and the verification command. A sakichan dispatch states the criteria, the base commit, and rikki's report.
+- Multi-dispatch plans share one brief file in the scratchpad; each dispatch gets the brief path, its own task and criteria, and a report path. sakichan gets the same paths, not a restated report.
+- Name every dispatch and run it in the background. On NEEDS_CONTEXT or failed criteria, resolve the gap and resume the same agent with SendMessage. Routine gaps are your call; ask the user only when readings differ materially.
+- At most 3 rikkis in flight, disjoint files, one commit each. Use `isolation: "worktree"` only when files must overlap; it branches from committed HEAD, so commit the base first, send sakichan to the reported worktree path, and integrate the branch yourself.
+- Verify each rikki as it finishes; run the full verification once per plan.
+- Resume once on NEEDS_CONTEXT; a second means fix the brief and re-dispatch. An isolated rikki that returns with no changes is re-dispatched, since its worktree is gone.
 - Review and audit subagents run at high effort.
 - Default to Opus for subagents and never fall back to Sonnet. If a task seems easy enough for Sonnet, run Opus at low or medium reasoning effort instead.
 - Reserve Haiku for trivial or simple tasks where raw speed matters most.
