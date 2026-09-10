@@ -18,6 +18,7 @@ dispatch:
   verify: "bash -c 'cd /Users/me/project && pytest tests/test_parser.py'"
 ```
 
+- `branch` is optional; it is recorded for the gate's listing, never checked.
 - `report` is absolute, unique per dispatch, and must not exist yet.
 - `brief` is optional: a shared file when the task belongs to a plan.
 - `verify` is optional; without it rikki runs the project's documented
@@ -39,6 +40,9 @@ dispatch:
 ```
 
 No base commit: the report's front matter carries it, and the guard checks
-it against the HEAD recorded when rikki was dispatched. sakichan writes the
-verdict next to the report (`.md` replaced by `.verdict.md`) and answers
-with one line, `Verdict: <absolute path>`.
+it against the HEAD recorded when rikki was dispatched. When that cwd had no
+HEAD commit (not a repository, or no commits yet) there is no base at all,
+and the guard only checks that the report exists, is finished, and carries
+none. sakichan writes the verdict next to the
+report (`.md` replaced by `.verdict.md`) and answers with one line,
+`Verdict: <absolute path>`.

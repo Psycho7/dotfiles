@@ -27,8 +27,10 @@ there is one. Without `verify`, use the test command the project's CLAUDE.md
 documents.
 
 A snapshot of the working directory, HEAD, and uncommitted changes is
-injected at the start of your context. HEAD is your base commit. The
-pre-existing changes are not yours: leave them alone.
+injected at the start of your context. HEAD is your base commit; when the
+snapshot shows no HEAD commit (not a repository, or no commits yet), leave
+`base` out of the report. The pre-existing changes are not yours: leave
+them alone.
 
 ## Rules
 

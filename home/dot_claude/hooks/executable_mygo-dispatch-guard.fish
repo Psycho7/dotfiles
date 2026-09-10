@@ -16,7 +16,7 @@ set -g agent ""
 function skeleton --argument-names type field note
     set -l lines "dispatch:" "  cwd: /abs/path/to/repo"
     if test "$type" = rikki
-        set -a lines "  branch: main"
+        set -a lines "  branch: main   # optional"
     end
     set -a lines "  report: /abs/path/to/report.md" "  criteria:" "    - first acceptance criterion"
     if test "$type" = rikki
@@ -65,6 +65,10 @@ function require_string --argument-names json name absolute
     if test "$absolute" = yes; and not string match -q '/*' -- $value
         deny "envelope field `$name` must be an absolute path, got `$value`." $name "must be an absolute path"
     end
+end
+
+function is_sha --argument-names value
+    string match -qr '^[0-9a-f]{40}$' -- $value
 end
 
 function require_criteria --argument-names json
@@ -155,7 +159,9 @@ end
 set -l key (key_of $report)
 
 if test "$agent" = rikki
-    require_string $dispatch branch no
+    if test (field_type $dispatch branch) != null
+        require_string $dispatch branch no
+    end
     if test (field_type $dispatch verify) != null
         require_string $dispatch verify no
     end
@@ -170,7 +176,10 @@ if test "$agent" = rikki
         deny "this report path is already pending verification: $report" report "pick a fresh report path"
     end
 
-    set -l head (git -C $cwd rev-parse HEAD 2>/dev/null)
+    # The recorded head is total: a SHA, or "none" when there is no HEAD
+    # commit (not a repository, or no commits yet).
+    set -l head (git -C $cwd rev-parse --verify -q HEAD 2>/dev/null)
+    test -n "$head"; or set head none
     set -l branch (field_value $dispatch branch)
     if not inflight_add $key $report $cwd $branch "$head"
         deny "the gate state directory is not writable." "" ""
@@ -183,32 +192,34 @@ if not test -f $report
     deny "the report to verify does not exist: $report" report "must be an existing rikki report"
 end
 
+set -l front
+if not set front (yq --front-matter=extract -o=json -I0 '.' $report 2>/dev/null)
+    deny "the report front matter is not valid YAML: $report" report "rikki must rewrite the report"
+end
+set -l report_status (printf '%s' $front | jq -r '.status // ""')
+set -l base (printf '%s' $front | jq -r '.base // ""')
+
 # Only a finished report can be verified; a rikki that stopped for input has
 # to be resumed first, and its report carries no base to compare.
-set -l report_status (yq --front-matter=extract -r '.status // ""' $report 2>/dev/null)
 if contains -- "$report_status" NEEDS_CONTEXT BLOCKED
     deny "report status is $report_status; resume rikki first" report "must be a DONE or DONE_WITH_CONCERNS report"
 end
 
-set -l base (yq --front-matter=extract -r '.base // ""' $report 2>/dev/null)
-if test $status -ne 0
-    deny "the report front matter is not valid YAML: $report" report "rikki must rewrite the report"
-end
-if not string match -qr '^[0-9a-f]{40}$' -- "$base"
-    deny "the report front matter has no 40-hex `base`: $report" report "rikki must record the starting HEAD"
-end
-if not git -C $cwd rev-parse --verify --quiet "$base^{commit}" >/dev/null 2>&1
-    deny "the report `base` $base is not a commit in $cwd" cwd "must be the repo holding the reported base commit"
-end
-
-set -l recorded ""
-for marker in $gate_dir/pending/$key $gate_dir/inflight/$key
-    if test -f $marker
-        set recorded (marker_get $marker head)
-        break
+# The head recorded at dispatch is the authority for base. With no marker
+# left the state was lost, so the report has to stand on its own.
+set -l recorded (recorded_head $key)
+if test -z "$recorded"
+    if not is_sha "$base"
+        deny "the report front matter has no 40-hex `base`: $report" report "rikki must record the starting HEAD"
     end
-end
-if test -n "$recorded" -a "$recorded" != "$base"
+    if not git -C $cwd rev-parse --verify --quiet "$base^{commit}" >/dev/null 2>&1
+        deny "the report `base` $base is not a commit in $cwd" cwd "must be the repo holding the reported base commit"
+    end
+else if test "$recorded" = none
+    if test -n "$base"
+        deny "the dispatch cwd had no HEAD commit, so the report cannot carry a `base`: $base" report "must have no base when there is no HEAD commit"
+    end
+else if test "$base" != "$recorded"
     deny "the report `base` $base differs from the HEAD recorded at dispatch, $recorded." report "must be the report of the rikki that started at $recorded"
 end
 

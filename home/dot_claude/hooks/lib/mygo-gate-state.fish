@@ -10,6 +10,8 @@
 # key = the report path with every "/" replaced by "%".
 # Marker files hold "field: value" lines: report, cwd, branch, head, agent_id,
 # verdict, and, while a sakichan runs or a resumed rikki works, state.
+# head is the commit rikki started from, or "none" when the dispatch cwd had
+# no HEAD commit (not a repository, or no commits yet).
 
 # Resolves the state dir, creates it, and leaves it in the global gate_dir.
 # Order: MYGO_VERIFICATION_GATE_DIR (tests), the hook input scratchpad_dir,
@@ -55,15 +57,27 @@ function marker_write --argument-names path
     mv -f $tmp $path
 end
 
+# Prints the value of the first "<field>: <value>" line; a bare "<field>:"
+# line prints an empty line. marker_write always puts one space after the
+# colon, so stripping leading spaces is enough.
 function marker_get --argument-names path field
     test -f "$path"; or return 1
     for line in (cat $path 2>/dev/null)
-        set -l m (string match -r '^'$field': ?(.*)$' -- $line)
-        if test (count $m) -ge 2
-            printf '%s\n' $m[2]
-            return 0
-        else if test (count $m) -eq 1
-            printf '\n'
+        string match -q -- "$field:*" $line; or continue
+        set -l value (string sub -s (math (string length -- $field) + 2) -- $line)
+        printf '%s\n' (string trim -l -c ' ' -- $value | string collect)
+        return 0
+    end
+    return 1
+end
+
+# The starting HEAD recorded for a report key: a commit SHA, or "none" when
+# the dispatch cwd had no HEAD commit. The pending marker wins over the
+# inflight one after a resume. Prints nothing when no marker is left.
+function recorded_head --argument-names key
+    for marker in $gate_dir/pending/$key $gate_dir/inflight/$key
+        if test -f $marker
+            marker_get $marker head
             return 0
         end
     end
@@ -135,7 +149,7 @@ function marker_set_field --argument-names path field value
 
     set -l lines
     for line in (cat $path 2>/dev/null)
-        if string match -qr '^'$field':' -- $line
+        if string match -q -- "$field:*" $line
             continue
         end
         set -a lines $line

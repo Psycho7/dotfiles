@@ -5,17 +5,19 @@ Markdown with YAML front matter. The front matter is parsed by the gate hooks wi
 Front matter:
 
 - `status`: `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, or `BLOCKED`.
-- `base`: the full 40-hex SHA of the HEAD rikki started from.
-- `branch`: the branch worked on.
+- `base`: the full 40-hex SHA of the HEAD rikki started from; omitted when
+  the snapshot shows no HEAD commit (not a repository, or no commits yet).
+- `branch`: the branch worked on, when there is one.
 - `worktree`: absolute path, only when the work ran in one.
 - `files`: list of `{path, lines}`; `lines` is a string such as `"12-40"`
   or `"12-40,88"` pointing at the key edits.
 - `tests`: list of `{phase, command, exit, result}`; `phase` is `before`
   for the failing run and `after` for the passing run.
 
-`DONE` and `DONE_WITH_CONCERNS` need non-empty `base`, `branch`, `files`,
-and a `tests` entry with `phase: after`. `NEEDS_CONTEXT` and `BLOCKED` need
-a `Question` section in the body.
+`DONE` and `DONE_WITH_CONCERNS` need non-empty `files`, a `tests` entry
+with `phase: after`, and `base` unless there was no HEAD commit, in which
+case the gate rejects a report that carries one. `NEEDS_CONTEXT` and
+`BLOCKED` need a `Question` section in the body.
 
 Body sections: `Deviations` (where the brief and the code disagreed and
 what was done about it), `Concerns` (visibility widenings, restructures,

@@ -24,7 +24,10 @@ for sub in $subcommands
         deny $sub
     end
     # `git branch` is read-only unless it deletes.
-    if test $sub = branch; and string match -qr -- '\s(-d|-D|--delete)\b' "$cmd"
-        deny branch
+    if test "$sub" = branch
+        set -l words (string split -n ' ' -- (string replace -a \t ' ' -- $cmd))
+        if contains -- -d $words; or contains -- -D $words; or contains -- --delete $words
+            deny branch
+        end
     end
 end

@@ -18,6 +18,7 @@ source (status dirname)/lib/mygo-gate-state.fish
 
 set -g report_checks '
 def ok_str: (type == "string") and (. != "");
+def is_sha: (type == "string") and test("^[0-9a-f]{40}$");
 [
   (if (.status | IN("DONE", "DONE_WITH_CONCERNS", "NEEDS_CONTEXT", "BLOCKED") | not)
    then "front matter: status must be DONE, DONE_WITH_CONCERNS, NEEDS_CONTEXT or BLOCKED" else empty end),
@@ -26,9 +27,15 @@ def ok_str: (type == "string") and (. != "");
 ]
 + (if (.status == "DONE") or (.status == "DONE_WITH_CONCERNS") then
 [
-  (if ((.base | type) != "string") or ((.base | tostring) | test("^[0-9a-f]{40}$") | not)
-   then "front matter: base must be the full 40-hex SHA of the starting HEAD" else empty end),
-  (if (.branch | ok_str | not) then "front matter: branch must be a non-empty string" else empty end),
+  (if $head == "none" then
+     (if (.base // "") != ""
+      then "front matter: the dispatch cwd had no HEAD commit, so base must be omitted" else empty end)
+   else
+     (if (.base | is_sha | not)
+      then "front matter: base must be the full 40-hex SHA of the starting HEAD" else empty end)
+   end),
+  (if (.branch != null) and (.branch | ok_str | not)
+   then "front matter: branch must be a non-empty string when present" else empty end),
   (if ((.files | type) != "array") or ((.files | length) == 0)
    then "front matter: files must be a non-empty list" else empty end),
   (if ((.files | type) == "array")
@@ -54,7 +61,7 @@ function block
 end
 
 function error_entry --argument-names id detail
-    set -l key "_error-"(string replace -a / % -- $id)
+    set -l key "_error-"(key_of $id)
     marker_write $gate_dir/pending/$key "report: (none)" "cwd: " "branch: " "head: " "verdict: error: $detail"
 end
 
@@ -77,27 +84,45 @@ function message_lines --argument-names msg
     printf '%s\n' $msg | string match -r -v '^\s*$'
 end
 
-function report_problems --argument-names report
+# The absolute path after "<label>: ", or nothing when the line is not
+# exactly that shape (a single label, one space, a path with no whitespace
+# right after the slash).
+function absolute_path_after --argument-names label line
+    string match -q -- "$label: /*" $line; or return 1
+    set -l path (string replace -- "$label: " '' $line)
+    test (string length -- $path) -gt 1; or return 1
+    string match -qr -- '^/\s' $path; and return 1
+    printf '%s\n' $path
+end
+
+function has_question_section --argument-names report
+    grep -qE '^#{1,6} *Question' $report
+end
+
+# head is the starting HEAD recorded at dispatch: "none" means the cwd had no
+# HEAD commit, so the report must not carry a base. Empty means the marker
+# is gone and the strict checks apply.
+function report_problems --argument-names report head
     if not test -f $report
         printf '%s\n' "the report file does not exist: $report"
         return
     end
 
-    set -l json (yq --front-matter=extract -o=json -I0 '.' $report 2>/dev/null)
-    if test $status -ne 0 -o -z "$json"
+    set -l json
+    if not set json (yq --front-matter=extract -o=json -I0 '.' $report 2>/dev/null); or test -z "$json"
         printf '%s\n' "the report front matter is missing or not valid YAML"
         return
     end
 
-    set -l problems (printf '%s' $json | jq -r $report_checks 2>/dev/null)
-    if test $status -ne 0
+    set -l problems
+    if not set problems (printf '%s' $json | jq -r --arg head "$head" $report_checks 2>/dev/null)
         printf '%s\n' "the report front matter is not a mapping"
         return
     end
 
     set -l status_value (printf '%s' $json | jq -r '.status // ""')
     if contains -- $status_value NEEDS_CONTEXT BLOCKED
-        if not grep -qE '^#{1,6} *Question' $report
+        if not has_question_section $report
             set -a problems "body: NEEDS_CONTEXT and BLOCKED need a Question section"
         end
     end
@@ -127,16 +152,12 @@ end
 set -l lines (message_lines $msg)
 
 if test "$agent" = sakichan
-    set -l m
-    if test (count $lines) -eq 1
-        set m (string match -r '^Verdict: (/\S.*)$' -- $lines[1])
-    end
-    if test (count $m) -lt 2
+    set -l verdict_file
+    if test (count $lines) -ne 1; or not set verdict_file (absolute_path_after Verdict $lines[1])
         error_entry $agent_id "sakichan final message was not exactly 'Verdict: <absolute path>'"
         exit 0
     end
 
-    set -l verdict_file $m[2]
     set -l derived (string replace -r '\.verdict\.md$' .md -- $verdict_file)
     set -l json (yq --front-matter=extract -o=json -I0 '.' $verdict_file 2>/dev/null)
     if test $status -ne 0 -o -z "$json"
@@ -174,12 +195,9 @@ if test "$agent" = sakichan
 end
 
 # rikki
-set -l m
-if test (count $lines) -ge 1 -a (count $lines) -le 2
-    set m (string match -r '^Report: (/\S.*)$' -- $lines[1])
-end
-if test (count $m) -lt 2
-    set -l key "_agent-"(string replace -a / % -- $agent_id)
+set -l report
+if test (count $lines) -lt 1 -o (count $lines) -gt 2; or not set report (absolute_path_after Report $lines[1])
+    set -l key "_agent-"(key_of $agent_id)
     if retry_bump $key
         block "Your final message must be exactly one line, 'Report: <absolute path to the report>'. For NEEDS_CONTEXT or BLOCKED a second line carries the question or blocker. Nothing else. Write the report file if you have not, then finish with that message."
     end
@@ -187,9 +205,8 @@ if test (count $m) -lt 2
     exit 0
 end
 
-set -l report $m[2]
 set -l key (key_of $report)
-set -l problems (report_problems $report)
+set -l problems (report_problems $report (recorded_head $key | string collect -a))
 
 if test (count $problems) -gt 0
     if retry_bump $key

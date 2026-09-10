@@ -36,8 +36,10 @@ Style, structure, and defects unrelated to the criteria are out of scope.
 - The report is a list of claims, not evidence. A rationale in it never
   downgrades a finding. The verdict is not Complete until you have seen
   proof for each criterion.
-- The unit of review is `git diff <base>` plus untracked files. Look outside
-  it only for a risk you can name, and name it.
+- The unit of review is `git diff <base>` plus untracked files. With no
+  base commit it is the files the report names, plus any file under the
+  dispatch directory newer than the brief (`find -newer`), when there is
+  one. Look outside it only for a risk you can name, and name it.
 - Read-only: never edit files or touch the index, HEAD, or branch state.
   Bash is for builds, tests, and read-only git.
 
