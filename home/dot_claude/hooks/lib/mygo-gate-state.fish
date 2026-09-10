@@ -13,8 +13,11 @@
 
 # Resolves the state dir, creates it, and leaves it in the global gate_dir.
 # Order: MYGO_VERIFICATION_GATE_DIR (tests), the hook input scratchpad_dir,
-# then a per-session dir under the temp dir, so the state is discarded with
-# the rest of /tmp instead of accumulating under $HOME.
+# then a per-session dir under the temp dir, so the state is reaped with the
+# temp dir instead of accumulating under $HOME. The per-uid root is created
+# 0700 and must be owned by us: on Linux the temp dir is the shared, sticky
+# /tmp, where any local user could otherwise pre-create that name and delete
+# a pending marker, which would fail the gate open.
 function state_dir --argument-names scratchpad session
     set -l dir
     if set -q MYGO_VERIFICATION_GATE_DIR; and test -n "$MYGO_VERIFICATION_GATE_DIR"
@@ -25,7 +28,10 @@ function state_dir --argument-names scratchpad session
         test -n "$session"; or set session unknown-session
         set -l tmp $TMPDIR
         test -n "$tmp"; or set tmp /tmp
-        set dir (string trim -r -c / -- $tmp)/claude-(id -u)/verification-gate/$session
+        set -l root (string trim -r -c / -- $tmp)/claude-(id -u)
+        mkdir -m 700 -p $root 2>/dev/null
+        test -d $root -a -O $root; or return 1
+        set dir $root/verification-gate/$session
     end
 
     set -g gate_dir $dir
