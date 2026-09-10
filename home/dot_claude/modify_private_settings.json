@@ -2,10 +2,17 @@
 # Merges managed fields into existing settings.json, preserving everything else.
 # Managed fields:
 #   - env.DISABLE_AUTOUPDATER, attribution, statusLine, showClearContextOnPlanAccept,
-#     skillListingBudgetFraction, askUserQuestionTimeout, hooks.SubagentStart,
-#     worktree.baseRef (replace)
+#     skillListingBudgetFraction, askUserQuestionTimeout, worktree.baseRef (replace)
+#   - hooks.PreToolUse, hooks.SubagentStart, hooks.SubagentStop, hooks.Stop (per-entry)
 #   - permissions.allow/deny (additive)
-# hooks.SubagentStart is replaced as a whole; other hook events are left alone.
+# A managed hook entry is identified by event, matcher, and the basename of the
+# hook command; a handler inside that entry is identified by the basename alone.
+# SubagentStart therefore owns two independent entries: matcher "rikki|sakichan"
+# for subagent-context.fish and matcher "rikki" for subagent-resumed.fish.
+# Nothing else takes part in the identity, so a stale copy of one of ours that
+# carries extra fields (an old "if" filter, say) is still recognized as ours.
+# Only entries and handlers matching one of ours are replaced; every other
+# entry in the same event, and every unknown field, is kept.
 #
 # Marketplaces and plugins are bootstrapped by run_once_after_install_claude_plugins.sh.tmpl
 # via the `claude plugin` CLI; the CLI itself owns enabledPlugins and extraKnownMarketplaces
@@ -60,9 +67,100 @@ baseline_permissions='[
   "Bash(dotnet new:*)"
 ]'
 
+# Hook entries we own, in the order they are appended to their event.
+managed_hooks='[
+  {
+    "event": "PreToolUse",
+    "entry": {
+      "matcher": "Agent",
+      "hooks": [
+        {"type": "command", "command": "\"$HOME/.claude/hooks/dispatch-guard.fish\"", "timeout": 10}
+      ]
+    }
+  },
+  {
+    "event": "SubagentStart",
+    "entry": {
+      "matcher": "rikki|sakichan",
+      "hooks": [
+        {"type": "command", "command": "\"$HOME/.claude/hooks/subagent-context.fish\"", "timeout": 10}
+      ]
+    }
+  },
+  {
+    "event": "SubagentStart",
+    "entry": {
+      "matcher": "rikki",
+      "hooks": [
+        {"type": "command", "command": "\"$HOME/.claude/hooks/subagent-resumed.fish\"", "timeout": 10}
+      ]
+    }
+  },
+  {
+    "event": "SubagentStop",
+    "entry": {
+      "matcher": "rikki|sakichan",
+      "hooks": [
+        {"type": "command", "command": "\"$HOME/.claude/hooks/subagent-done.fish\"", "timeout": 10}
+      ]
+    }
+  },
+  {
+    "event": "Stop",
+    "entry": {
+      "hooks": [
+        {"type": "command", "command": "\"$HOME/.claude/hooks/verification-gate.fish\"", "timeout": 10}
+      ]
+    }
+  }
+]'
+
 echo "$existing" | jq \
     --argjson baseline "$baseline_permissions" \
-    --argjson deny "$deny_permissions" '
+    --argjson deny "$deny_permissions" \
+    --argjson managed_hooks "$managed_hooks" '
+  def hook_basename: split("/") | last | sub("\"$"; "");
+
+  # Handler identity inside an entry: the command basename alone, wrapped in an
+  # array so that a handler with no command string keys as [] and never matches
+  # one of ours.
+  def hook_key: [.command? | strings | hook_basename];
+
+  # Update our handlers in place (our fields win, theirs are kept) and append
+  # the ones that are missing. Several existing handlers can share our key
+  # (older versions of this script wrote one dispatch-guard handler per "if"
+  # filter); they collapse into a single handler at the position of the first.
+  def merge_handlers($ours):
+    reduce $ours[] as $our (.;
+      . as $handlers |
+      ($our | hook_key) as $key |
+      [range($handlers | length) as $i | select($handlers[$i] | hook_key == $key) | $i] as $at |
+      if ($at | length) == 0 then
+        $handlers + [$our]
+      else
+        (reduce $at[] as $i ({}; . + $handlers[$i])) as $mine |
+        (($mine + $our) | if ($our | has("if")) then . else del(.if) end) as $merged |
+        [range($handlers | length) as $i
+         | select(($at[1:] | index($i)) == null)
+         | if $i == $at[0] then $merged else $handlers[$i] end]
+      end
+    );
+
+  def replace_entry($event; $entry):
+    ([$entry.hooks[].command | hook_basename]) as $names |
+    ((.hooks[$event]) // []) as $entries |
+    ($entries | map(
+      ((.matcher // null) == ($entry.matcher // null)) and
+      ([.hooks[]? | .command? | strings | hook_basename] | any(. as $name | $names | index($name)))
+    ) | index(true)) as $at |
+    .hooks[$event] = (
+      if $at == null then
+        $entries + [$entry]
+      else
+        $entries | .[$at].hooks = ((.[$at].hooks // []) | merge_handlers($entry.hooks))
+      end
+    );
+
   .env.DISABLE_AUTOUPDATER = "1" |
   .attribution = {"commit": "", "pr": "", "sessionUrl": false} |
   .statusLine = {"type": "command", "command": "bunx -y ccstatusline@latest", "padding": 0} |
@@ -70,7 +168,7 @@ echo "$existing" | jq \
   .skillListingBudgetFraction = 0.03 |
   .askUserQuestionTimeout = "60s" |
   .worktree.baseRef = "head" |
-  .hooks.SubagentStart = [{"matcher": "rikki|sakichan", "hooks": [{"type": "command", "command": "\"$HOME/.claude/hooks/subagent-context.fish\"", "timeout": 10}]}] |
   .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
-  .permissions.deny = ((.permissions.deny // []) + $deny | unique)
+  .permissions.deny = ((.permissions.deny // []) + $deny | unique) |
+  reduce $managed_hooks[] as $managed (.; replace_entry($managed.event; $managed.entry))
 '
