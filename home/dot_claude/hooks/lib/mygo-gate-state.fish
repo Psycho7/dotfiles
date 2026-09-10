@@ -12,12 +12,12 @@
 # verdict, and, while a sakichan runs or a resumed rikki works, state.
 
 # Resolves the state dir, creates it, and leaves it in the global gate_dir.
-# Order: CLAUDE_VERIFICATION_GATE_DIR (tests), the hook input scratchpad_dir,
+# Order: MYGO_VERIFICATION_GATE_DIR (tests), the hook input scratchpad_dir,
 # then a per-session dir under $HOME.
 function state_dir --argument-names scratchpad session
     set -l dir
-    if set -q CLAUDE_VERIFICATION_GATE_DIR; and test -n "$CLAUDE_VERIFICATION_GATE_DIR"
-        set dir $CLAUDE_VERIFICATION_GATE_DIR
+    if set -q MYGO_VERIFICATION_GATE_DIR; and test -n "$MYGO_VERIFICATION_GATE_DIR"
+        set dir $MYGO_VERIFICATION_GATE_DIR
     else if test -n "$scratchpad"
         set dir $scratchpad/verification-gate
     else

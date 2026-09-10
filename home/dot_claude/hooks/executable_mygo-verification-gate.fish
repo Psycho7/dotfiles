@@ -7,9 +7,9 @@
 # is the backstop. inflight entries and pending entries in state verifying or
 # resumed are listed for information only and never block, because a completing
 # rikki or sakichan re-invokes the parent and the next Stop is gated.
-# CLAUDE_VERIFICATION_GATE=0 disables the block for the session.
+# MYGO_VERIFICATION_GATE=0 disables the block for the session.
 
-source (status dirname)/lib/gate-state.fish
+source (status dirname)/lib/mygo-gate-state.fish
 
 set -g routes "Routes: dispatch sakichan for an unverified entry; resume rikki with SendMessage and re-verify a failed one; or, if the user decides to accept the work as-is, delete the named pending file."
 
@@ -36,7 +36,7 @@ function describe --argument-names marker
     printf '%s\n' "- $report" "  cwd: $cwd  branch: $branch" "  state: $state  pending file: $marker"
 end
 
-if test "$CLAUDE_VERIFICATION_GATE" = 0
+if test "$MYGO_VERIFICATION_GATE" = 0
     exit 0
 end
 
@@ -46,10 +46,10 @@ set -l session (printf '%s' $input | jq -r '.session_id // empty' 2>/dev/null)
 
 set -l dir (state_dir "$scratchpad" "$session")
 if test $status -ne 0
-    block "The verification gate state directory $gate_dir cannot be created or read, so pending verifications cannot be checked. Fix the directory or set CLAUDE_VERIFICATION_GATE=0 for this session, then stop again."
+    block "The verification gate state directory $gate_dir cannot be created or read, so pending verifications cannot be checked. Fix the directory or set MYGO_VERIFICATION_GATE=0 for this session, then stop again."
 end
 if not test -r $dir/pending -a -x $dir/pending
-    block "The verification gate state directory $dir/pending cannot be read, so pending verifications cannot be checked. Fix the directory or set CLAUDE_VERIFICATION_GATE=0 for this session, then stop again."
+    block "The verification gate state directory $dir/pending cannot be read, so pending verifications cannot be checked. Fix the directory or set MYGO_VERIFICATION_GATE=0 for this session, then stop again."
 end
 
 set -l blocking

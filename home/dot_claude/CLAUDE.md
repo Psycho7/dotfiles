@@ -126,16 +126,14 @@ Refactor auth middleware
 - Only re-read files you will edit or where the summary is ambiguous.
 
 ## Subagents
-- Delegate implementation to `rikki` and gate it with `sakichan` only when the user asks for it or the task has stated acceptance criteria and touches three or more files; otherwise work inline. An implementer's report is a set of claims until verified.
-- When a skill calls for an implementer or reviewer subagent, dispatch `rikki` and `sakichan` in those roles (a skill the user named counts as the user asking).
-- Load the `mygo` skill before dispatching either one; it carries the dispatch envelope and the orchestration protocol.
-- `sakichan` verifies correctness, not code quality. Run `/code-review` as the quality pass before opening a PR.
+- `rikki` implements, `sakichan` verifies. The `mygo` skill is required to dispatch them; use it for work with acceptance criteria across several files, or when the user asks for it.
+- Smaller features go through `/feature-dev`; trivial edits stay inline.
 - Default to Opus for subagents and never fall back to Sonnet. If a task seems easy enough for Sonnet, run Opus at low or medium reasoning effort instead.
 - Reserve Haiku for trivial or simple tasks where raw speed matters most.
-- Review and audit subagents run at high effort; `sakichan` is a verifier and runs at medium.
+- Review and audit subagents run at high effort.
 
 ## Tools
-- Use `jq` for JSON processing
+- Use `jq` for JSON processing, `yq` for YAML and Markdown front matter
 - File finding: use `fd` (not `find`)
 - Content search: use `rg` (not `grep`)
 - Prefer built-in tools over Bash where available:

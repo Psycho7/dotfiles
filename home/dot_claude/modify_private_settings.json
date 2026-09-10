@@ -8,7 +8,7 @@
 # A managed hook entry is identified by event, matcher, and the basename of the
 # hook command; a handler inside that entry is identified by the basename alone.
 # SubagentStart therefore owns two independent entries: matcher "rikki|sakichan"
-# for subagent-context.fish and matcher "rikki" for subagent-resumed.fish.
+# for mygo-subagent-context.fish and matcher "rikki" for mygo-subagent-resumed.fish.
 # Nothing else takes part in the identity, so a stale copy of one of ours that
 # carries extra fields (an old "if" filter, say) is still recognized as ours.
 # Only entries and handlers matching one of ours are replaced; every other
@@ -74,7 +74,7 @@ managed_hooks='[
     "entry": {
       "matcher": "Agent",
       "hooks": [
-        {"type": "command", "command": "\"$HOME/.claude/hooks/dispatch-guard.fish\"", "timeout": 10}
+        {"type": "command", "command": "\"$HOME/.claude/hooks/mygo-dispatch-guard.fish\"", "timeout": 10}
       ]
     }
   },
@@ -83,7 +83,7 @@ managed_hooks='[
     "entry": {
       "matcher": "rikki|sakichan",
       "hooks": [
-        {"type": "command", "command": "\"$HOME/.claude/hooks/subagent-context.fish\"", "timeout": 10}
+        {"type": "command", "command": "\"$HOME/.claude/hooks/mygo-subagent-context.fish\"", "timeout": 10}
       ]
     }
   },
@@ -92,7 +92,7 @@ managed_hooks='[
     "entry": {
       "matcher": "rikki",
       "hooks": [
-        {"type": "command", "command": "\"$HOME/.claude/hooks/subagent-resumed.fish\"", "timeout": 10}
+        {"type": "command", "command": "\"$HOME/.claude/hooks/mygo-subagent-resumed.fish\"", "timeout": 10}
       ]
     }
   },
@@ -101,7 +101,7 @@ managed_hooks='[
     "entry": {
       "matcher": "rikki|sakichan",
       "hooks": [
-        {"type": "command", "command": "\"$HOME/.claude/hooks/subagent-done.fish\"", "timeout": 10}
+        {"type": "command", "command": "\"$HOME/.claude/hooks/mygo-subagent-done.fish\"", "timeout": 10}
       ]
     }
   },
@@ -109,7 +109,7 @@ managed_hooks='[
     "event": "Stop",
     "entry": {
       "hooks": [
-        {"type": "command", "command": "\"$HOME/.claude/hooks/verification-gate.fish\"", "timeout": 10}
+        {"type": "command", "command": "\"$HOME/.claude/hooks/mygo-verification-gate.fish\"", "timeout": 10}
       ]
     }
   }
@@ -128,7 +128,7 @@ echo "$existing" | jq \
 
   # Update our handlers in place (our fields win, theirs are kept) and append
   # the ones that are missing. Several existing handlers can share our key
-  # (older versions of this script wrote one dispatch-guard handler per "if"
+  # (older versions of this script wrote one mygo-dispatch-guard handler per "if"
   # filter); they collapse into a single handler at the position of the first.
   def merge_handlers($ours):
     reduce $ours[] as $our (.;

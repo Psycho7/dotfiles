@@ -9,7 +9,7 @@
 # shows a skeleton envelope with that field marked.
 # Fails closed: any internal error denies too.
 
-source (status dirname)/lib/gate-state.fish
+source (status dirname)/lib/mygo-gate-state.fish
 
 set -g agent ""
 
@@ -20,7 +20,7 @@ function skeleton --argument-names type field note
     end
     set -a lines "  report: /abs/path/to/report.md" "  criteria:" "    - first acceptance criterion"
     if test "$type" = rikki
-        set -a lines "  verify: command to run" "  commit: false"
+        set -a lines "  verify: command to run   # optional"
     end
     set -a lines "  brief: /abs/path/to/brief.md   # optional"
 
@@ -156,13 +156,8 @@ set -l key (key_of $report)
 
 if test "$agent" = rikki
     require_string $dispatch branch no
-    require_string $dispatch verify no
-    set -l commit_type (field_type $dispatch commit)
-    if test "$commit_type" = null
-        deny "envelope has no `commit`." commit "missing"
-    end
-    if test "$commit_type" != boolean
-        deny "envelope field `commit` must be true or false, got $commit_type." commit "must be true or false"
+    if test (field_type $dispatch verify) != null
+        require_string $dispatch verify no
     end
 
     if test -e $report

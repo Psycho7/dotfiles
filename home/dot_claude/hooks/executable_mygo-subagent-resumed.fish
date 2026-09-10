@@ -10,7 +10,7 @@
 # and so does a resume that matches an inflight marker instead, left by a rikki
 # that stopped NEEDS_CONTEXT or BLOCKED: an inflight entry never blocks Stop.
 
-source (status dirname)/lib/gate-state.fish
+source (status dirname)/lib/mygo-gate-state.fish
 
 set -l input (cat)
 set -l agent (printf '%s' $input | jq -r '.agent_type // empty' 2>/dev/null)

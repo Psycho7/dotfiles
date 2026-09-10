@@ -14,12 +14,11 @@
 # sakichan: the final message must be "Verdict: <absolute path>"; only the
 # verdict Complete clears the pending entry. sakichan is never blocked.
 
-source (status dirname)/lib/gate-state.fish
+source (status dirname)/lib/mygo-gate-state.fish
 
 set -g report_checks '
 def ok_str: (type == "string") and (. != "");
 [
-  (if (.schema != 1) then "front matter: schema must be 1" else empty end),
   (if (.status | IN("DONE", "DONE_WITH_CONCERNS", "NEEDS_CONTEXT", "BLOCKED") | not)
    then "front matter: status must be DONE, DONE_WITH_CONCERNS, NEEDS_CONTEXT or BLOCKED" else empty end),
   (if (.worktree != null) and (.worktree | ok_str | not)
@@ -30,7 +29,6 @@ def ok_str: (type == "string") and (. != "");
   (if ((.base | type) != "string") or ((.base | tostring) | test("^[0-9a-f]{40}$") | not)
    then "front matter: base must be the full 40-hex SHA of the starting HEAD" else empty end),
   (if (.branch | ok_str | not) then "front matter: branch must be a non-empty string" else empty end),
-  (if (.commits | type) != "array" then "front matter: commits must be a list" else empty end),
   (if ((.files | type) != "array") or ((.files | length) == 0)
    then "front matter: files must be a non-empty list" else empty end),
   (if ((.files | type) == "array")
