@@ -127,13 +127,14 @@ Refactor auth middleware
 
 ## Subagents
 - `rikki` implements, `sakichan` verifies. The `mygo` skill is required to dispatch them; use it for work with acceptance criteria across several files, or when the user asks for it.
-- Smaller features go through `/feature-dev`; trivial edits stay inline.
-- Default to Opus for subagents and never fall back to Sonnet. If a task seems easy enough for Sonnet, run Opus at low or medium reasoning effort instead.
-- Reserve Haiku for trivial or simple tasks where raw speed matters most.
-- Review and audit subagents run at high effort.
+- Smaller features go through `/feature-dev`.
+- Mechanical, token-heavy work with no design judgment (renames, reference sweeps, bulk fixture edits) goes to a subagent with exact instructions and a verification command, not inline.
+- Subagents run Opus; Review and audit subagents run at high effort.
+- Haiku only for mechanical work where speed matters.
 
 ## Tools
-- Use `jq` for JSON processing, `yq` for YAML and Markdown front matter
+- `jq` for JSON processing
+- `yq` for YAML and Markdown front matter
 - File finding: use `fd` (not `find`)
 - Content search: use `rg` (not `grep`)
 - Prefer built-in tools over Bash where available:
