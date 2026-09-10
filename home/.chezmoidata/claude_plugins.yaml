@@ -25,7 +25,6 @@ claude:
     enabled:
       - claude-md-management@claude-plugins-official
       - code-simplifier@claude-plugins-official
-      - superpowers@claude-plugins-official
       - obsidian@obsidian-skills
       - claude-code-setup@claude-plugins-official
     disabled:
