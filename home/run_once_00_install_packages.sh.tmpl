@@ -3,7 +3,7 @@ set -e
 
 {{ if eq .chezmoi.os "darwin" -}}
 echo "Installing packages on macOS..."
-brew install fish ripgrep fd jq starship zoxide bat btop yazi fzf gh git-delta gnupg node
+brew install fish ripgrep fd jq yq starship zoxide bat btop yazi fzf gh git-delta gnupg node
 brew install oven-sh/bun/bun
 brew install --cask font-fira-code-nerd-font
 brew install --cask ghostty
@@ -62,6 +62,18 @@ if ! command -v yazi &> /dev/null; then
     sudo install -m 755 "${YAZI_TMP}/yazi-${YAZI_TRIPLE}/yazi" /usr/local/bin/yazi
     sudo install -m 755 "${YAZI_TMP}/yazi-${YAZI_TRIPLE}/ya" /usr/local/bin/ya
     rm -rf "${YAZI_TMP}"
+fi
+# Install yq (mikefarah; apt's yq is a different Python tool with another CLI)
+if ! command -v yq &> /dev/null; then
+    case "$(uname -m)" in
+        x86_64)  YQ_ARCH="amd64" ;;
+        aarch64) YQ_ARCH="arm64" ;;
+        *)       echo "Unsupported architecture for yq: $(uname -m)" >&2; exit 1 ;;
+    esac
+    YQ_TMP=$(mktemp -d)
+    curl -sSL "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${YQ_ARCH}" -o "${YQ_TMP}/yq"
+    sudo install -m 755 "${YQ_TMP}/yq" /usr/local/bin/yq
+    rm -rf "${YQ_TMP}"
 fi
 echo "Packages installed successfully!"
 {{ end -}}
