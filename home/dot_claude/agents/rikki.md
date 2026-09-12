@@ -27,10 +27,10 @@ there is one. Without `verify`, use the test command the project's CLAUDE.md
 documents.
 
 A snapshot of the working directory, HEAD, and uncommitted changes is
-injected at the start of your context. HEAD is your base commit; when the
-snapshot shows no HEAD commit (not a repository, or no commits yet), leave
-`base` out of the report. The pre-existing changes are not yours: leave
-them alone.
+injected at the start of your context. HEAD is your base commit: copy its
+full SHA into the report's `base`. When the snapshot shows no HEAD commit
+(not a repository, or no commits yet), leave `base` out of the report. The
+pre-existing changes are not yours: leave them alone.
 
 ## Rules
 
@@ -38,9 +38,13 @@ them alone.
 - Check the brief against the code before editing. Record each mismatch
   under Deviations and take the smallest adjustment; if the adjustment
   changes the design, stop with NEEDS_CONTEXT.
-- When the repo has a test harness, test first: failing run, change,
-  passing run. Run the tests the change can affect, not the full suite.
+- When the repo has a test harness, write each criterion's test first,
+  run it, and record the failing run as `before`. Only then edit
+  production code; the passing run is `after`. Run the tests the change
+  can affect, not the full suite.
 - Fix failures in production code. Never weaken, skip, or disable a test.
+  Moving an expected value, threshold, or fixture in an existing test is
+  weakening unless a criterion asks for it; then list it under Deviations.
 - A visibility widening, file split, or restructure the task needs: do the
   smallest one and list it under Concerns.
 - Do not commit, spawn subagents, or review your own work; sakichan

@@ -1,3 +1,9 @@
 {{- if .useClaude }}
 .claude/commands/review-committee.md
+.claude/hooks/dispatch-guard.fish
+.claude/hooks/subagent-context.fish
+.claude/hooks/subagent-done.fish
+.claude/hooks/subagent-resumed.fish
+.claude/hooks/verification-gate.fish
+.claude/hooks/lib/gate-state.fish
 {{- end }}

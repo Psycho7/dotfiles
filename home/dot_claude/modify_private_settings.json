@@ -12,7 +12,9 @@
 # Nothing else takes part in the identity, so a stale copy of one of ours that
 # carries extra fields (an old "if" filter, say) is still recognized as ours.
 # Only entries and handlers matching one of ours are replaced; every other
-# entry in the same event, and every unknown field, is kept.
+# entry in the same event, and every unknown field, is kept. A renamed hook
+# is a new identity: its old name goes on the retired list and its handlers
+# are dropped before the merge, along with any entry left empty.
 #
 # Marketplaces and plugins are bootstrapped by run_once_after_install_claude_plugins.sh.tmpl
 # via the `claude plugin` CLI; the CLI itself owns enabledPlugins and extraKnownMarketplaces
@@ -115,11 +117,29 @@ managed_hooks='[
   }
 ]'
 
+# Old basenames of renamed hooks.
+retired_hooks='[
+  "dispatch-guard.fish",
+  "subagent-context.fish",
+  "subagent-done.fish",
+  "subagent-resumed.fish",
+  "verification-gate.fish"
+]'
+
 echo "$existing" | jq \
     --argjson baseline "$baseline_permissions" \
     --argjson deny "$deny_permissions" \
-    --argjson managed_hooks "$managed_hooks" '
+    --argjson managed_hooks "$managed_hooks" \
+    --argjson retired "$retired_hooks" '
   def hook_basename: split("/") | last | sub("\"$"; "");
+
+  def is_retired: (.command? | strings | hook_basename) as $name | $retired | index($name) != null;
+
+  def drop_retired:
+    .hooks |= ((. // {}) | with_entries(.value |= map(
+      if .hooks == null then .
+      else (.hooks |= map(select(is_retired | not))) | select(.hooks | length > 0)
+      end)));
 
   # Handler identity inside an entry: the command basename alone, wrapped in an
   # array so that a handler with no command string keys as [] and never matches
@@ -170,5 +190,6 @@ echo "$existing" | jq \
   .worktree.baseRef = "head" |
   .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
   .permissions.deny = ((.permissions.deny // []) + $deny | unique) |
+  drop_retired |
   reduce $managed_hooks[] as $managed (.; replace_entry($managed.event; $managed.entry))
 '

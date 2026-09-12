@@ -12,7 +12,9 @@
 # marked invalid on the second try. Every valid status records agent_id on the
 # marker it leaves behind, so a SubagentStart for the same rikki finds it.
 # sakichan: the final message must be "Verdict: <absolute path>"; only the
-# verdict Complete clears the pending entry. sakichan is never blocked.
+# verdict Complete clears the pending entry. sakichan is never blocked. A
+# malformed message is an error entry only while some entry is being
+# verified; otherwise it is a stray wake-up and ignored.
 
 source (status dirname)/lib/mygo-gate-state.fish
 
@@ -63,6 +65,17 @@ end
 function error_entry --argument-names id detail
     set -l key "_error-"(key_of $id)
     marker_write $gate_dir/pending/$key "report: (none)" "cwd: " "branch: " "head: " "verdict: error: $detail"
+end
+
+# True while a sakichan is expected to report (the dispatch guard marks her
+# entry verifying). A sakichan woken again after her verdict, by a background
+# command ending hours later, finds none; her stray message must not reopen
+# the gate.
+function any_verifying
+    for marker in (pending_list)
+        test (marker_get $marker state) = verifying; and return 0
+    end
+    return 1
 end
 
 # A verdict for a key with no pending entry: an inflight marker means the rikki
@@ -154,7 +167,7 @@ set -l lines (message_lines $msg)
 if test "$agent" = sakichan
     set -l verdict_file
     if test (count $lines) -ne 1; or not set verdict_file (absolute_path_after Verdict $lines[1])
-        error_entry $agent_id "sakichan final message was not exactly 'Verdict: <absolute path>'"
+        any_verifying; and error_entry $agent_id "sakichan final message was not exactly 'Verdict: <absolute path>'"
         exit 0
     end
 

@@ -12,7 +12,8 @@ Front matter:
 - `files`: list of `{path, lines}`; `lines` is a string such as `"12-40"`
   or `"12-40,88"` pointing at the key edits.
 - `tests`: list of `{phase, command, exit, result}`; `phase` is `before`
-  for the failing run and `after` for the passing run.
+  for the failing run, taken before the first production edit, and `after`
+  for the passing run.
 
 `DONE` and `DONE_WITH_CONCERNS` need non-empty `files`, a `tests` entry
 with `phase: after`, and `base` unless there was no HEAD commit, in which

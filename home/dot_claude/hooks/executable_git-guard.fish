@@ -14,7 +14,7 @@ set -l git_call '(?:^|[;&|(`])\s*git\s+(?:-\S*(?:\s+[^-\s]\S*)?\s+)*(\S+)'
 set -l subcommands (string match -arg $git_call -- "$cmd")
 
 function deny --argument-names subcommand
-    jq -cn --arg reason "git $subcommand is not allowed for this agent. Leave the working tree and branch as they are; the caller commits, discards, or rewrites." \
+    jq -cn --arg reason "git $subcommand is not allowed for this agent. Leave the working tree and branch as they are; the caller commits, discards, or rewrites. Read a file as it was with git show <base>:<path>; see your changes with git diff <base> -- <path>." \
         '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "deny", permissionDecisionReason: $reason}}'
     exit 0
 end

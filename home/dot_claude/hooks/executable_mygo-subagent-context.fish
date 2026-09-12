@@ -31,7 +31,8 @@ end
 
 set -l lines "cwd: "(pwd)
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1
-    set -l head (git rev-parse --short HEAD 2>/dev/null)
+    # Full SHA: the report's base needs all 40 hex digits.
+    set -l head (git rev-parse --verify -q HEAD 2>/dev/null)
     test -n "$head"; or set head "none (no commits)"
     set -l branch (git symbolic-ref --short -q HEAD)
     test -n "$branch"; or set branch "detached"

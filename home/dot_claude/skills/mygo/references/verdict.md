@@ -12,9 +12,9 @@ Front matter:
 
 Body: a `Criteria` table (criterion or claim, verdict PASS/FAIL/CANNOT
 VERIFY, evidence as file:line or a command with the relevant output lines),
-then `Findings` (unreported drift and test-quality problems only, each with
-severity Critical/Important/Minor, file:line, what is wrong, why it
-matters; one line saying none if there are none).
+then `Findings` (unreported drift only, each with severity
+Critical/Important/Minor, file:line, what is wrong, why it matters; one
+line saying none if there are none).
 
 ````markdown
 ---
