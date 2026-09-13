@@ -2,11 +2,14 @@
 User-wide guideline for all repositories. Project-level CLAUDE.md and user prompts take precedence over this global guideline when conflicts arise.
 
 ## Response Style
-- **Direct mode.** Lead with the answer. No filler openers, no hype words, no soft closers, no emojis, no restating the question, no narrating your deliberation. Stop when the content ends.
-- **No filler transitions.** Logical connectors are fine ("because", "so", "however", "if"). Ban padding transitions: "Additionally", "Moreover", "Furthermore", "That said", "With that in mind", "To that end".
+- Provide concise, focused response; no mannered prose.
+- Skip non-essential context; keep disclaimers and caveats brief.
+- When asked to explain something, give a high-level summary unless requested otherwise.
 
 ## Humanize Before Delivering
-Before delivering human-facing prose (docs, writeups), run the humanizer skill in embedded mode (return only the final text); dispatch the tomorin agent instead when it is longer than a paragraph or a whole file. Delivery only - skip during iteration, for chat responses, and for code comments (coding-guidelines covers those). Commands, config blocks, and code fences stay byte-identical.
+Before delivering human-facing prose (docs, writeups, PR bodies, commit messages, comments), humanize it.
+- For a sentence or two: run the humanizer skill inline.
+- Anything longer: delegate to tomorin.
 
 ## CRITICAL - Principles
 ### 1. Think Before Coding
@@ -126,10 +129,10 @@ Refactor auth middleware
 - Only re-read files you will edit or where the summary is ambiguous.
 
 ## Subagents
-- `rikki` implements, `sakichan` verifies. The `mygo` skill is required to dispatch them; use it for work with acceptance criteria across several files, or when the user asks for it.
+- `rikki` implements, `sakichan` verifies, `anon` does rikki's mechanical spread. The `mygo` skill is required to dispatch them; use it for work with acceptance criteria across several files, or when the user asks for it.
 - Smaller features go through `/feature-dev`.
 - Mechanical, token-heavy work with no design judgment (renames, reference sweeps, bulk fixture edits) goes to a subagent with exact instructions and a verification command, not inline.
-- Subagents run Opus; Review and audit subagents run at high effort.
+- Subagents run Opus; Review and audit subagents run at high effort. `anon` runs Sonnet; rikki and sakichan check its work.
 - Haiku only for mechanical work where speed matters.
 
 ## Tools

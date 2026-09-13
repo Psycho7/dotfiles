@@ -1,8 +1,9 @@
 #!/bin/bash
 # Merges managed fields into existing settings.json, preserving everything else.
 # Managed fields:
-#   - env.DISABLE_AUTOUPDATER, attribution, statusLine, showClearContextOnPlanAccept,
-#     skillListingBudgetFraction, askUserQuestionTimeout, worktree.baseRef (replace)
+#   - env.DISABLE_AUTOUPDATER, env.CLAUDE_CODE_THRIFTY_SONIC, attribution, statusLine,
+#     showClearContextOnPlanAccept, skillListingBudgetFraction, askUserQuestionTimeout,
+#     worktree.baseRef (replace)
 #   - hooks.PreToolUse, hooks.SubagentStart, hooks.SubagentStop, hooks.Stop (per-entry)
 #   - permissions.allow/deny (additive)
 # A managed hook entry is identified by event, matcher, and the basename of the
@@ -182,6 +183,7 @@ echo "$existing" | jq \
     );
 
   .env.DISABLE_AUTOUPDATER = "1" |
+  .env.CLAUDE_CODE_THRIFTY_SONIC = "0" |
   .attribution = {"commit": "", "pr": "", "sessionUrl": false} |
   .statusLine = {"type": "command", "command": "bunx -y ccstatusline@latest", "padding": 0} |
   .showClearContextOnPlanAccept = true |

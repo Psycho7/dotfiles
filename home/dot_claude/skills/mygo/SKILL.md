@@ -5,9 +5,8 @@ description: Dispatch rikki (implementer) and sakichan (verifier) for work that 
 
 # Dispatching rikki and sakichan
 
-Not every task needs this. Small changes go inline or through
-`/feature-dev`; this skill is for work whose result must be verified
-before you accept it.
+This skill is for high-stakes or complex works.
+For trivial works, suggest `feature-dev` or inline.
 
 ## Protocol
 
@@ -20,17 +19,22 @@ before you accept it.
   (formatter, audit, visual protocol, from CLAUDE.md or your memory), each
   with its command; subagents see neither your memory nor this
   conversation. `verify` is the task's targeted test command.
+- An Explore does the groundwork and writes its map to the scratchpad;
+  never read source for a brief. A brief names files, symbols and
+  rulings, no line numbers.
+- A dispatch is one coherent change of any size.
+- A removal brief: what goes, and the search that proves it gone.
 - Report paths are absolute, unique per dispatch, and must not exist yet.
   A plan with several tasks shares one brief file in the scratchpad.
-- Run dispatches in the background. At most 3 rikkis in flight, on disjoint
-  files. Parallel rikkis in one checkout see each other's edits land and
-  sakichan may flag those as drift, so give overlapping work
-  `isolation: "worktree"`; that branches from committed HEAD, so commit the
-  base first, and integrate the branch yourself afterwards.
+- Run every independent task in the background at once. Use worktrees to
+  avoid collision: commit the base first, integrate the branch yourself
+  after.
 - rikki never commits. You commit after the verdict, when the user asked
   for commits.
 - Every DONE rikki gets its own sakichan on its report. sakichan checks
   the criteria, not quality; `/code-review` is the quality pass before a PR.
+- Read reports and verdicts by front matter (`yq --front-matter=extract`).
+  Read further sections only when needed.
 - On NEEDS_CONTEXT or a failed verdict, resolve the gap and resume the same
   agent with SendMessage, then re-verify. Resume once; a second
   NEEDS_CONTEXT means the brief is wrong, fix it and re-dispatch.
