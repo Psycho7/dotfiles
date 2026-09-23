@@ -2,8 +2,6 @@
 name: anon
 description: rikki's worker. Does one mechanical, file-local job (a deletion, a sweep, a fixture update) from exact instructions. Never commits.
 tools: Read, Edit, Write, Glob, Grep, Bash
-skills:
-  - coding-guidelines
 model: sonnet
 effort: medium
 color: pink

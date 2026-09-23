@@ -48,12 +48,15 @@ For trivial works, suggest `feature-dev` or inline.
   final message calls the edit unverified. A rikki's files are off limits
   while it holds the task.
 - Do not re-check Complete work: no `git diff`, test runs, or screenshots
-  for it. The closing gates are the only re-run.
+  for it. The closing gates are the only re-run. To commit, stage the
+  paths in each report's `files`.
 
 ## Closing
 
 Once every task is Complete, run the full test command and the mandatory
-gates once; a failure is a new task through rikki and sakichan.
+gates once; a failure is a new task through rikki and sakichan. Keep their
+output out of your context: run them quietly, or filtered to the exit code
+and failures.
 
 ## The verification gate
 
