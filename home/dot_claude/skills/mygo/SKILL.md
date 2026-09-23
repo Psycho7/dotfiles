@@ -19,9 +19,10 @@ For trivial works, suggest `feature-dev` or inline.
   (formatter, audit, visual protocol, from CLAUDE.md or your memory), each
   with its command; subagents see neither your memory nor this
   conversation. `verify` is the task's targeted test command.
-- An Explore does the groundwork and writes its map to the scratchpad;
-  never read source for a brief. A brief names files, symbols and
-  rulings, no line numbers.
+- An Explore does the groundwork and returns a map of at most ~40 lines:
+  files and symbols, facts with `path:line`, open questions. Never read
+  source for a brief. A brief names files, symbols and rulings, no line
+  numbers.
 - A dispatch is one coherent change of any size.
 - A removal brief: what goes, and the search that proves it gone.
 - Report paths are absolute, unique per dispatch, and must not exist yet.
@@ -33,8 +34,12 @@ For trivial works, suggest `feature-dev` or inline.
   for commits.
 - Every DONE rikki gets its own sakichan on its report. sakichan checks
   the criteria, not quality; `/code-review` is the quality pass before a PR.
-- Read reports and verdicts by front matter (`yq --front-matter=extract`).
-  Read further sections only when needed.
+- A sakichan prompt is the envelope alone, no prose; she reads the report
+  and the brief herself.
+- Read reports by front matter (`yq --front-matter=extract`), further
+  sections only when needed. Never read a verdict to learn its outcome:
+  the Stop gate lists every report not yet Complete. Open a verdict file
+  only for an `Incomplete` or `Cannot verify` entry.
 - On NEEDS_CONTEXT or a failed verdict, resolve the gap and resume the same
   agent with SendMessage, then re-verify. Resume once; a second
   NEEDS_CONTEXT means the brief is wrong, fix it and re-dispatch.
@@ -42,6 +47,8 @@ For trivial works, suggest `feature-dev` or inline.
   it lists. Follow-up is a new dispatch with a new report path, or the
   final message calls the edit unverified. A rikki's files are off limits
   while it holds the task.
+- Do not re-check Complete work: no `git diff`, test runs, or screenshots
+  for it. The closing gates are the only re-run.
 
 ## Closing
 
