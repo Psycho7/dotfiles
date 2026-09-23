@@ -3,7 +3,8 @@
 # Managed fields:
 #   - env.DISABLE_AUTOUPDATER, env.CLAUDE_CODE_THRIFTY_SONIC, attribution, statusLine,
 #     showClearContextOnPlanAccept, skillListingBudgetFraction, askUserQuestionTimeout,
-#     worktree.baseRef (replace)
+#     worktree.baseRef, syncClaudeAiSkills, syncClaudeAiPlugins,
+#     skillOverrides["claude-api"], skillOverrides["claude-in-chrome"] (replace)
 #   - hooks.PreToolUse, hooks.SubagentStart, hooks.SubagentStop, hooks.Stop (per-entry)
 #   - permissions.allow/deny (additive)
 # A managed hook entry is identified by event, matcher, and the basename of the
@@ -190,6 +191,10 @@ echo "$existing" | jq \
   .skillListingBudgetFraction = 0.03 |
   .askUserQuestionTimeout = "60s" |
   .worktree.baseRef = "head" |
+  .syncClaudeAiSkills = false |
+  .syncClaudeAiPlugins = false |
+  .skillOverrides["claude-api"] = "name-only" |
+  .skillOverrides["claude-in-chrome"] = "name-only" |
   .permissions.allow = ((.permissions.allow // []) + $baseline | unique) |
   .permissions.deny = ((.permissions.deny // []) + $deny | unique) |
   drop_retired |
