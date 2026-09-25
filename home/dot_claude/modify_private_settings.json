@@ -1,7 +1,7 @@
 #!/bin/bash
 # Merges managed fields into existing settings.json, preserving everything else.
 # Managed fields:
-#   - env.DISABLE_AUTOUPDATER, env.CLAUDE_CODE_THRIFTY_SONIC, attribution, statusLine,
+#   - autoUpdatesChannel, env.CLAUDE_CODE_THRIFTY_SONIC, attribution, statusLine,
 #     showClearContextOnPlanAccept, skillListingBudgetFraction, askUserQuestionTimeout,
 #     worktree.baseRef, syncClaudeAiSkills, syncClaudeAiPlugins,
 #     skillOverrides["claude-api"], skillOverrides["claude-in-chrome"] (replace)
@@ -183,9 +183,10 @@ echo "$existing" | jq \
       end
     );
 
-  .env.DISABLE_AUTOUPDATER = "1" |
+  del(.env.DISABLE_AUTOUPDATER) |
+  .autoUpdatesChannel = "latest" |
   .env.CLAUDE_CODE_THRIFTY_SONIC = "0" |
-  .attribution = {"commit": "", "pr": "", "sessionUrl": false} |
+  .attribution = false |
   .statusLine = {"type": "command", "command": "bunx -y ccstatusline@latest", "padding": 0} |
   .showClearContextOnPlanAccept = true |
   .skillListingBudgetFraction = 0.03 |
