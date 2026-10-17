@@ -1,6 +1,8 @@
 ---
 name: csharp-style
-description: C# code style preferences for writing and refactoring code. Use this skill whenever writing, refactoring, or reviewing C# code in this codebase — especially when composing behaviors, designing APIs, or structuring logic. Also applies when the user asks you to clean up, simplify, or restructure C# code.
+description: C# code style preferences for writing and refactoring code. Use this skill whenever writing, refactoring, or reviewing C# code — especially when composing behaviors, designing APIs, or structuring logic. Also applies when the user asks you to clean up, simplify, or restructure C# code.
+metadata:
+  coding-skill: "true"
 ---
 
 # C# Code Style Preferences

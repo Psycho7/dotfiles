@@ -1,17 +1,50 @@
 ---
-name: coding-guidelines
-description: Use when writing, refactoring, or reviewing code in any language, before the first line is written, and whenever deciding how to structure, name, comment, or expose it.
+name: coding-principles
+description: Use when writing, editing, refactoring, or reviewing code in any language, before the first line is written, and whenever deciding how much to change or how to structure, name, comment, or expose it.
+metadata:
+  coding-skill: "true"
 ---
 
-# Coding Guidelines
+# Coding Principles
 
 Language-agnostic rules for code the user maintains by hand. Language-specific
-skills build on these and win on conflict. The behavioral principles
-(simplicity, surgical changes, test-first) live in the
-global CLAUDE.md and are not repeated here.
+skills build on these and win on conflict.
+
+## Simplicity
+
+- Write the minimum code that solves the problem. Nothing speculative.
+- No features, flexibility, or configurability beyond what was requested.
+- No abstractions for single-use code.
+- No error handling for impossible scenarios.
+
+## Surgical changes
+
+- Every changed line traces to the request. Clean up only your own mess.
+- Do not "improve" adjacent code, comments, or formatting, and do not
+  refactor what is not broken.
+- Mention unrelated dead code; do not delete it.
+
+## Tests
+
+- Fix a bug by first writing a test that reproduces it.
+
+## Write first, simplify later
+
+- Prioritize working code. Duplication and verbosity are fine while in
+  progress.
+- Do not optimize mid-iteration while requirements shift or bugs are being
+  fixed.
+- Reuse functions, utilities, and tools already in the codebase or its
+  dependencies before writing new ones.
+- Simplify only at a natural boundary: a module, feature, or plan is
+  complete and stable, and its tests pass. Skip simplification for
+  throwaway, exploratory, or prototype code.
 
 ## Structure
 
+- Single responsibility; avoid coincidental cohesion.
+- Prefer duplication over the wrong abstraction.
+- Name things after what they do, matching their siblings.
 - Return or continue early. Keep nesting shallow.
 - Name meaningful or recurring values as constants or enums. A value that
   comes from a spec (HTTP 200, a port, a magic byte, a timeout from an RFC)

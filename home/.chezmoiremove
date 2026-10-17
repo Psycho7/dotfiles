@@ -6,4 +6,6 @@
 .claude/hooks/subagent-resumed.fish
 .claude/hooks/verification-gate.fish
 .claude/hooks/lib/gate-state.fish
+.claude/rules/coding-guidelines.md
+.claude/skills/coding-guidelines
 {{- end }}

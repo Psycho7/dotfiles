@@ -76,7 +76,7 @@ The Claude `modify_private_settings.json` uses `jq` to additively merge baseline
 ### Claude Code Asset Gotchas
 
 - `paths` globs in skill or rule frontmatter must be `**/*.{ext,...}`; a bare `*.py` never matches.
-- A `paths` rule injects its body on file read; a `paths` skill is only listed. `rules/coding-guidelines.md` therefore points at the `coding-guidelines` skill instead of duplicating it.
+- A `paths` rule injects its body on file read; a `paths` skill is only listed. `rules/coding-principles.md` therefore points at the `coding-principles` skill instead of duplicating it.
 - Skills and agents are indexed at session start; a live check needs a fresh `claude -p` session, which costs tokens, so only run one when asked.
 
 ### What's Excluded

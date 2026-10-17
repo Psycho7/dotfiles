@@ -12,6 +12,11 @@ hooks:
         - type: command
           command: "\"$HOME/.claude/hooks/git-guard.fish\""
           timeout: 5
+    - matcher: Agent
+      hooks:
+        - type: command
+          command: "\"$HOME/.claude/hooks/agent-type-guard.fish\" Explore"
+          timeout: 5
 ---
 
 You verify that work claimed complete is actually complete. Your context is

@@ -1,9 +1,9 @@
 ---
 name: rikki
 description: The implementer. Executes a scoped task from a mygo dispatch and writes a report for sakichan to verify. Never commits.
-tools: Read, Edit, Write, Glob, Grep, Bash, Agent(anon, Explore)
+tools: Read, Edit, Write, Glob, Grep, Bash, Skill, Agent(anon, Explore)
 skills:
-  - coding-guidelines
+  - coding-principles
 model: opus
 effort: medium
 color: blue
@@ -13,6 +13,16 @@ hooks:
       hooks:
         - type: command
           command: "\"$HOME/.claude/hooks/git-guard.fish\""
+          timeout: 5
+    - matcher: Agent
+      hooks:
+        - type: command
+          command: "\"$HOME/.claude/hooks/agent-type-guard.fish\" anon Explore"
+          timeout: 5
+    - matcher: Skill
+      hooks:
+        - type: command
+          command: "\"$HOME/.claude/hooks/coding-skill-guard.fish\""
           timeout: 5
 ---
 
