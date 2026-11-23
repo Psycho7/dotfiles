@@ -20,6 +20,7 @@ Before delivering human-facing prose (docs, writeups, PR bodies, commit messages
 
 ## Interaction and Tooling Discipline
 - Find all affected sites before asking a scoping question. Ask once with the real scope.
+- Before asking a design-decision question, lay out the concrete per-option differences (table or worked example) first; keep option labels short.
 - After asking, stop and wait; never pre-commit to a guessed option. If the question times out, take the most conservative reading, carry it as a stated assumption, and lead the final report with it.
 - Verify paths, files, and scope with a real read/grep before launching a workflow or fan-out. Never size work off unverified bash output, invented filenames, or stale summaries.
 - Do not run commands that change the machine or profile (`chezmoi apply`, installs, service restarts, config applies) unless explicitly asked. Editing source is not a request to apply it.
