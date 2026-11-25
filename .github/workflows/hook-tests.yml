@@ -1,0 +1,50 @@
+name: Hook tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'home/dot_claude/hooks/**'
+      - 'home/dot_claude/modify_private_settings.json'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/hook-tests.yml'
+  pull_request:
+    paths:
+      - 'home/dot_claude/hooks/**'
+      - 'home/dot_claude/modify_private_settings.json'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/hook-tests.yml'
+
+jobs:
+  hook-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install fish and jq
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fish jq
+
+      - name: Install yq
+        shell: bash
+        env:
+          YQ_VERSION: v4.54.3
+          YQ_SHA256: 129534601871538efe0ba4c5e62a34fb1d5f469bcb975c4fddeb467d82974973
+        run: |
+          curl -sSfL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o "$RUNNER_TEMP/yq"
+          echo "${YQ_SHA256}  $RUNNER_TEMP/yq" | sha256sum -c -
+          sudo install -m 755 "$RUNNER_TEMP/yq" /usr/local/bin/yq
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.4.0
+
+      - name: Run hook and settings merge tests
+        shell: bash
+        run: uv run --locked pytest

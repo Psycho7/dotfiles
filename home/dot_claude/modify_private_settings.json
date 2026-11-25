@@ -135,7 +135,11 @@ echo "$existing" | jq \
     --argjson retired "$retired_hooks" '
   def hook_basename: split("/") | last | sub("\"$"; "");
 
-  def is_retired: (.command? | strings | hook_basename) as $name | $retired | index($name) != null;
+  # Ours only when it lives in .claude/hooks/: a user script elsewhere may share
+  # a retired basename. any/2 yields false for a handler with no command string;
+  # a bare "as $name" binding would yield nothing and select() would drop it.
+  def is_retired: any(.command? | strings | select(contains(".claude/hooks/")) | hook_basename;
+    . as $name | $retired | index($name) != null);
 
   def drop_retired:
     .hooks |= ((. // {}) | with_entries(.value |= map(
