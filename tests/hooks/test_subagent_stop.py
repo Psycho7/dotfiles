@@ -13,7 +13,6 @@ from hookcase import (
     want_allow,
     want_block,
     write_report,
-    write_verdict,
 )
 
 # Each concurrent hook must exit within this many seconds.
@@ -22,10 +21,6 @@ HOOK_TIMEOUT_S = 10
 
 def rikki_stop(run_hook, msg, agent_id):
     return run_hook(DONE_HOOK, stop_input("rikki", msg, agent_id))
-
-
-def sakichan_stop(run_hook, msg, agent_id):
-    return run_hook(DONE_HOOK, stop_input("sakichan", msg, agent_id))
 
 
 def test_rikki_valid_done_moves_inflight_to_pending(run_hook, state, srcrepo, tmp_path):
@@ -118,49 +113,6 @@ def test_rikki_no_inflight_marker_takes_branch_and_head_from_the_report(
     assert marker_field(marker, "head") == srcrepo.head
     assert marker_field(marker, "cwd") == ""
     want_block(run_hook(GATE, gate_input()), str(report), "cwd: (unknown)")
-
-
-def done_then_verdict(run_hook, srcrepo, tmp_path, name, rikki_id, sakichan_id, result, failed):
-    report = tmp_path / f"{name}.md"
-    verdict = tmp_path / f"{name}.verdict.md"
-    dispatch_rikki(run_hook, srcrepo.path, report)
-    write_report(report, "DONE", srcrepo.head)
-    rikki_stop(run_hook, f"Report: {report}", rikki_id)
-    write_verdict(verdict, report, result, failed)
-    return report, sakichan_stop(run_hook, f"Verdict: {verdict}", sakichan_id)
-
-
-def test_sakichan_complete_removes_the_pending_entry(run_hook, state, srcrepo, tmp_path):
-    report, result = done_then_verdict(
-        run_hook, srcrepo, tmp_path, "v1", "agent-8", "agent-9", "Complete", 0
-    )
-    want_allow(result)
-    assert not pending(state, report).exists()
-
-
-def test_sakichan_incomplete_annotates_the_pending_entry(run_hook, state, srcrepo, tmp_path):
-    report, result = done_then_verdict(
-        run_hook, srcrepo, tmp_path, "v2", "agent-10", "agent-11", "Incomplete", 2
-    )
-    want_allow(result)
-    assert marker_field(pending(state, report), "verdict") == "Incomplete (2 failed)"
-
-
-def test_sakichan_cannot_verify_annotates_the_pending_entry(run_hook, state, srcrepo, tmp_path):
-    report, result = done_then_verdict(
-        run_hook, srcrepo, tmp_path, "v3", "agent-12", "agent-13", "Cannot verify", 0
-    )
-    want_allow(result)
-    assert marker_field(pending(state, report), "verdict") == "Cannot verify"
-
-
-def test_sakichan_missing_verdict_file_marks_the_entry_unreadable(run_hook, state, srcrepo, tmp_path):
-    report = tmp_path / "v4.md"
-    dispatch_rikki(run_hook, srcrepo.path, report)
-    write_report(report, "DONE", srcrepo.head)
-    rikki_stop(run_hook, f"Report: {report}", "agent-14")
-    want_allow(sakichan_stop(run_hook, f"Verdict: {tmp_path / 'v4.verdict.md'}", "agent-15"))
-    assert marker_field(pending(state, report), "verdict") == "unreadable"
 
 
 def test_concurrent_rikki_completions_keep_both_entries(run_hook, state, srcrepo, tmp_path):

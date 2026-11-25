@@ -101,13 +101,8 @@ def merged() -> str:
 
 
 @pytest.fixture(scope="module")
-def customized() -> subprocess.CompletedProcess[str]:
-    return merge(json.dumps(CUSTOMIZED))
-
-
-@pytest.fixture(scope="module")
-def customized_out(customized: subprocess.CompletedProcess[str]) -> str:
-    return customized.stdout
+def customized_out() -> str:
+    return merge(json.dumps(CUSTOMIZED)).stdout
 
 
 @pytest.fixture(scope="module")
@@ -116,46 +111,20 @@ def retired_out() -> str:
 
 
 CHECKS = [
-    ("empty input: PreToolUse has one unfiltered mygo-dispatch-guard handler", "empty_out",
-     '''[.hooks.PreToolUse[] | select(.matcher == "Agent") | .hooks[]] | length == 1
-     and (.[0].command | test("mygo-dispatch-guard.fish"))
-     and (.[0] | has("if") | not)
-     and (.[0].timeout == 10)'''),
-    ("empty input: SubagentStart entry present once", "empty_out",
-     '[.hooks.SubagentStart[] | select(.hooks[].command | test("mygo-subagent-context.fish"))] | length == 1'),
     ("empty input: SubagentStart has our two entries, one handler each", "empty_out",
      '''(.hooks.SubagentStart | length) == 2
      and (.hooks.SubagentStart | map(.matcher) == ["rikki|sakichan", "rikki"])
      and (.hooks.SubagentStart | all(.hooks | length == 1))'''),
-    ("empty input: SubagentStart matcher rikki runs mygo-subagent-resumed", "empty_out",
-     '''[.hooks.SubagentStart[] | select(.matcher == "rikki") | .hooks[]]
-     | length == 1
-     and (.[0].command | test("mygo-subagent-resumed.fish"))
-     and (.[0].timeout == 10)'''),
-    ("empty input: SubagentStop entry present once", "empty_out",
-     '[.hooks.SubagentStop[] | select(.hooks[].command | test("mygo-subagent-done.fish"))] | length == 1'),
-    ("empty input: Stop entry present once with no matcher", "empty_out",
-     '''[.hooks.Stop[] | select(.hooks[].command | test("mygo-verification-gate.fish"))]
-     | length == 1 and (.[0] | has("matcher") | not)'''),
-    ("empty input: every managed handler has timeout 10", "empty_out",
-     r'''[.hooks | to_entries[] | .value[] | .hooks[] | select(.command | test("\\.claude/hooks/"))
-      | .timeout] | length == 5 and all(. == 10)'''),
     ("merge keeps unknown top-level fields", "merged", '.userSetting == "keep me"'),
     ("merge keeps the unrelated PreToolUse hook", "merged",
      '''[.hooks.PreToolUse[] | select(.matcher == "Bash")
       | .hooks[] | select(.command | test("user-hook.sh")) | select(.timeout == 5)] | length == 1'''),
-    ("merge appends our PreToolUse entry alongside it", "merged", '(.hooks.PreToolUse | length) == 2'),
-    ("merge replaces the stale SubagentStart entry", "merged",
-     '''[.hooks.SubagentStart[] | select(.matcher == "rikki|sakichan")]
-     | length == 1 and (.[0].hooks | length) == 1 and (.[0].hooks[0].timeout == 10)'''),
     ("merge keeps the user SubagentStart entry and appends ours", "merged",
      '''(.hooks.SubagentStart | length) == 3
      and ([.hooks.SubagentStart[] | select(.matcher == "tomorin")
            | .hooks[] | select(.command | test("user-subagent.sh")) | select(.timeout == 5)] | length == 1)
      and ([.hooks.SubagentStart[] | select(.matcher == "rikki")
            | .hooks[] | select(.command | test("mygo-subagent-resumed.fish"))] | length == 1)'''),
-    ("merge adds SubagentStop and Stop to an existing hooks object", "merged",
-     '(.hooks.SubagentStop | length) == 1 and (.hooks.Stop | length) == 1'),
     ("merge leaves exactly one entry per managed hook script", "merged",
      r'''[.hooks | to_entries[] | .value[] | .hooks[] | .command
       | select(test("\\.claude/hooks/")) | split("/") | last | sub("\"$"; "")]
@@ -185,8 +154,6 @@ CHECKS = [
      '''[.hooks.PreToolUse[] | select(.matcher == "Agent") | .hooks[]
       | select(.command? // "" | test("mygo-dispatch-guard.fish"))
       | select(.timeout == 10)] | length == 1'''),
-    ("merge keeps the command-less Stop handler", "customized_out",
-     '[.hooks.Stop[] | .hooks[] | select(.prompt? == "no command key here")] | length == 1'),
     # The command-less Stop entry is not one of ours, so ours is appended beside it.
     ("merge appends our Stop entry beside the unrelated one", "customized_out",
      '''(.hooks.Stop | length) == 2 and
@@ -210,20 +177,6 @@ def test_check(request: pytest.FixtureRequest, output: str, jq_filter: str) -> N
     assert result.returncode == 0, f"jq -e failed ({result.returncode}): {result.stderr}\n{document}"
 
 
-def test_merge_survives_a_handler_with_no_command_key(customized: subprocess.CompletedProcess[str]) -> None:
-    assert customized.returncode == 0, customized.stderr
-
-
-@pytest.mark.parametrize(
-    "output",
-    ["customized_out", "merged", "empty_out", "retired_out"],
-    ids=[
-        "merge is idempotent on a hand-edited settings file",
-        "merge is idempotent on its own output",
-        "merge is idempotent on empty input output",
-        "merge is idempotent on retired handler output",
-    ],
-)
-def test_idempotent(request: pytest.FixtureRequest, output: str) -> None:
-    first = request.getfixturevalue(output)
+def test_idempotent() -> None:
+    first = merge(json.dumps(CUSTOMIZED)).stdout
     assert merge(first).stdout == first

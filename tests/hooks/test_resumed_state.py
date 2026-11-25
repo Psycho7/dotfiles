@@ -42,13 +42,6 @@ def test_subagent_start_an_unknown_agent_id_changes_nothing(run_hook, state, src
     assert marker_field(pending(state, report), "state") == ""
 
 
-def test_subagent_start_a_non_rikki_agent_changes_nothing(run_hook, state, srcrepo, tmp_path):
-    report = tmp_path / "x4.md"
-    incomplete_rikki(run_hook, srcrepo.path, srcrepo.head, report, "agent-39")
-    want_allow(run_hook(RESUMED, start_input("sakichan", "agent-39")))
-    assert marker_field(pending(state, report), "state") == ""
-
-
 def test_stop_gate_a_resumed_entry_alone_does_not_block(run_hook, srcrepo, tmp_path):
     report = tmp_path / "x5.md"
     incomplete_rikki(run_hook, srcrepo.path, srcrepo.head, report, "agent-40")

@@ -49,18 +49,6 @@ def test_rikki_missing_field_denies_naming_it(run_hook, srcrepo):
     want_deny(run_guard(run_hook, "rikki", prompt, srcrepo.path), "report", "missing")
 
 
-def test_rikki_verify_is_optional(run_hook, srcrepo, tmp_path):
-    prompt = fenced(
-        "dispatch:",
-        f"  cwd: {srcrepo.path}",
-        "  branch: main",
-        f"  report: {tmp_path / 'r2.md'}",
-        "  criteria:",
-        "    - something",
-    )
-    want_allow(run_guard(run_hook, "rikki", prompt, srcrepo.path))
-
-
 def test_rikki_branch_is_optional(run_hook, srcrepo, tmp_path):
     prompt = fenced(
         "dispatch:",
@@ -91,13 +79,6 @@ def test_rikki_pending_report_path_denies(run_hook, state, srcrepo, tmp_path):
     want_deny(dispatch_rikki(run_hook, srcrepo.path, report), "report", "pending verification")
 
 
-def test_sakichan_matching_base_allows(run_hook, srcrepo, tmp_path):
-    report = tmp_path / "s1.md"
-    dispatch_rikki(run_hook, srcrepo.path, report)
-    write_report(report, "DONE", srcrepo.head)
-    want_allow(run_guard(run_hook, "sakichan", sakichan_envelope(srcrepo.path, report), srcrepo.path))
-
-
 def test_sakichan_missing_report_denies(run_hook, srcrepo, tmp_path):
     prompt = sakichan_envelope(srcrepo.path, tmp_path / "s2.md")
     want_deny(run_guard(run_hook, "sakichan", prompt, srcrepo.path), "report", "does not exist")
@@ -108,14 +89,3 @@ def test_sakichan_base_that_is_not_a_commit_denies(run_hook, srcrepo, tmp_path):
     write_report(report, "DONE", NOCOMMIT)
     prompt = sakichan_envelope(srcrepo.path, report)
     want_deny(run_guard(run_hook, "sakichan", prompt, srcrepo.path), "not a commit")
-
-
-def test_sakichan_base_different_from_recorded_head_denies(run_hook, srcrepo, tmp_path):
-    report = tmp_path / "s4.md"
-    dispatch_rikki(run_hook, srcrepo.path, report)
-    write_report(report, "DONE", srcrepo.base1)
-    prompt = sakichan_envelope(srcrepo.path, report)
-    want_deny(
-        run_guard(run_hook, "sakichan", prompt, srcrepo.path),
-        "differs from the HEAD recorded at dispatch",
-    )

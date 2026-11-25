@@ -13,7 +13,7 @@ DENIED = [
     ("git stash", "stash"),
     ("git switch main", "switch"),
     ("git branch -D feature", "branch"),
-    ("git rebase -i HEAD~3", "rebase"),
+    ("git rebase main", "rebase"),
 ]
 
 ALLOWED = [

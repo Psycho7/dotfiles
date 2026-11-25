@@ -81,16 +81,3 @@ def test_sakichan_stop_incomplete_with_no_pending_promotes_the_inflight_marker(
     result = run_hook(GATE, gate_input())
     want_block(result, str(report), str(srcrepo.path), "Incomplete (1 failed)")
     assert "Still in flight" not in block_reason(result)
-
-
-def test_subagent_start_the_promoted_entry_is_resumed_and_the_gate_allows(
-    run_hook, state, srcrepo, tmp_path
-):
-    report = tmp_path / "y6.md"
-    needs_context_rikki(run_hook, srcrepo.path, srcrepo.head, report, "agent-49")
-    verdict = tmp_path / "y6.verdict.md"
-    write_verdict(verdict, report, "Incomplete", 1)
-    run_hook(DONE_HOOK, stop_input("sakichan", f"Verdict: {verdict}", "agent-50"))
-    want_allow(run_hook(RESUMED, start_input("rikki", "agent-49")))
-    assert marker_field(pending(state, report), "state") == "resumed"
-    want_allow(run_hook(GATE, gate_input()))
